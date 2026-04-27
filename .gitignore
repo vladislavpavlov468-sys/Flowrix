@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# База данных
+*.db
+*.sqlite3
+
+# Виртуальное окружение
+venv/
+.venv/
+env/
+
+# Загруженные файлы
+uploads/
+
+# Переменные окружения
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
