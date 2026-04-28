@@ -2,4 +2,171 @@
 
 {% block title %}Каталог — Flowrix Market{% endblock %}
 
-{% block content %}{% endblock %}
+{% block content %}
+<div style="max-width: var(--container-max); margin: 0 auto; padding: 3rem 1.5rem;">
+
+  <div class="row g-0">
+
+    <aside class="col-12 col-lg-2" style="background: var(--color-surface);
+                  border-right: 1px solid var(--color-border);
+                  padding: 2rem 1.5rem;
+                  min-height: 100%;">
+
+      <p style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+                text-transform: uppercase; color: var(--color-muted);
+                margin-bottom: 1rem;">
+        Категории
+      </p>
+
+      <ul style="list-style: none; padding: 0; margin: 0 0 2rem 0;">
+        <li style="margin-bottom: 0.5rem;">
+          <a href="{{ url_for('products.index', q=search) }}" style="font-size: 14px; text-decoration: none;
+                    color: {% if not active_category %}var(--color-text){% else %}var(--color-muted){% endif %};
+                    font-weight: {% if not active_category %}500{% else %}400{% endif %};">
+            Все товары
+          </a>
+        </li>
+        {% for cat in categories %}
+        <li style="margin-bottom: 0.5rem;">
+          <a href="{{ url_for('products.index', category=cat, q=search) }}" style="font-size: 14px; text-decoration: none;
+                      color: {% if active_category == cat %}var(--color-text){% else %}var(--color-muted){% endif %};
+                      font-weight: {% if active_category == cat %}500{% else %}400{% endif %};">
+            {{ cat }}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+
+      {% if categories %}
+      <div style="border-top: 1px solid var(--color-border); padding-top: 1.5rem;">
+        <p style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+                    text-transform: uppercase; color: var(--color-muted);
+                    margin-bottom: 0.75rem;">
+          Поиск
+        </p>
+        <form method="GET" action="{{ url_for('products.index') }}">
+          {% if active_category %}
+          <input type="hidden" name="category" value="{{ active_category }}">
+          {% endif %}
+          <input type="text" name="q" class="input-fx" placeholder="Название..." value="{{ search }}"
+            style="margin-bottom: 0.75rem;">
+          <button type="submit" class="btn-primary-fx w-100" style="padding: 8px 16px; font-size: 13px;">
+            Найти
+          </button>
+        </form>
+      </div>
+      {% endif %}
+
+    </aside>
+
+    <main class="col-12 col-lg-10" style="padding: 2rem 2rem 2rem 2.5rem;">
+
+      <div class="d-flex align-items-baseline justify-content-between mb-4"
+        style="border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
+        <div>
+          {% if active_category %}
+          <h1 style="font-size: 24px; font-weight: 500; margin: 0;">
+            {{ active_category }}
+          </h1>
+          {% elif search %}
+          <h1 style="font-size: 24px; font-weight: 500; margin: 0;">
+            Результаты поиска: «{{ search }}»
+          </h1>
+          {% else %}
+          <h1 style="font-size: 24px; font-weight: 500; margin: 0;">Все товары</h1>
+          {% endif %}
+        </div>
+        <span style="font-size: 13px; color: var(--color-muted);">
+          {{ products|length }} товаров
+        </span>
+      </div>
+
+      {% if not categories %}
+      <form class="d-flex gap-2 mb-5" method="GET" action="{{ url_for('products.index') }}">
+        <input type="text" name="q" class="input-fx" placeholder="Поиск по каталогу..." value="{{ search }}"
+          style="max-width: 360px;">
+        <button type="submit" class="btn-primary-fx" style="padding: 10px 24px;">
+          Найти
+        </button>
+        {% if search %}
+        <a href="{{ url_for('products.index') }}" class="btn-secondary-fx" style="padding: 10px 20px;">
+          Сбросить
+        </a>
+        {% endif %}
+      </form>
+      {% endif %}
+
+      {% if products %}
+      <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-4">
+        {% for product in products %}
+        <div class="col">
+          <a href="{{ url_for('products.detail', product_id=product.id) }}"
+            style="text-decoration: none; color: inherit; display: block;" class="product-card">
+
+            <div style="background: var(--color-surface);
+                            aspect-ratio: 1 / 1;
+                            overflow: hidden;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-bottom: 0.75rem;">
+              {% if product.image_filename %}
+              <img src="{{ url_for('products.uploaded_file', filename=product.image_filename) }}"
+                alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+              {% else %}
+              <i class="bi bi-box" style="font-size: 3rem; color: var(--color-border);"></i>
+              {% endif %}
+            </div>
+
+            <p style="font-size: 13px; color: var(--color-muted);
+                          letter-spacing: 0.04em; text-transform: uppercase;
+                          margin-bottom: 0.25rem;">
+              {{ product.category or "Без категории" }}
+            </p>
+            <p style="font-size: 15px; font-weight: 500; margin-bottom: 0.25rem;
+                          line-height: 1.3;">
+              {{ product.name }}
+            </p>
+            <p style="font-size: 15px; font-weight: 600; margin: 0;">
+              {{ "%.0f"|format(product.price_float) }} ₽
+            </p>
+
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <div class="d-flex flex-column align-items-center justify-content-center text-center" style="padding: 6rem 2rem;">
+        <i class="bi bi-search" style="font-size: 2.5rem; color: var(--color-border);
+                                          margin-bottom: 1rem;"></i>
+        <p style="font-size: 16px; font-weight: 500; margin-bottom: 0.5rem;">
+          Ничего не найдено
+        </p>
+        <p style="font-size: 14px; color: var(--color-muted); margin-bottom: 1.5rem;">
+          Попробуйте изменить параметры поиска
+        </p>
+        <a href="{{ url_for('products.index') }}" class="btn-secondary-fx">
+          Сбросить фильтры
+        </a>
+      </div>
+      {% endif %}
+
+    </main>
+  </div>
+</div>
+
+<style>
+  .product-card:hover .product-card-img img {
+    transform: scale(1.03);
+  }
+
+  .product-card>div:first-child {
+    transition: opacity 0.15s ease;
+  }
+
+  .product-card:hover>div:first-child {
+    opacity: 0.9;
+  }
+</style>
+{% endblock %}

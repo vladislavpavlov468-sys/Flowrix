@@ -26,7 +26,12 @@ function fetchCart() {
         <div class="cart-item">
           <div class="d-flex justify-content-between align-items-start">
             <span class="cart-item__name">${item.product_name}</span>
-            <span class="cart-item__price">${item.subtotal} ₽</span>
+            <div class="d-flex align-items-center gap-2">
+              <span class="cart-item__price">${item.subtotal} ₽</span>
+              <button class="btn btn-sm text-muted p-0 border-0 ms-2" onclick="deleteCartItem(${item.id})" title="Удалить">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
           </div>
           <div style="font-size:12px; color: var(--color-muted); margin-top:0.25rem;">
             ${item.quantity} шт. × ${item.price} ₽
@@ -50,4 +55,13 @@ function fetchCart() {
 function updateCartCount(count) {
   const countEl = document.getElementById("cart-count");
   if (countEl) countEl.textContent = count;
+}
+
+function deleteCartItem(itemId) {
+  fetch(`/api/cart/${itemId}`, { method: "DELETE" })
+    .then((response) => response.json())
+    .then(() => {
+      fetchCart();
+    })
+    .catch((error) => console.error("Ошибка при удалении товара:", error));
 }

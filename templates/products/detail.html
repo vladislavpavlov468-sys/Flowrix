@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} — Flowrix Market{% endblock %}
+
+{% block content %}
+<div style="max-width: var(--container-max); margin: 0 auto; padding: 3rem 1.5rem;">
+
+  <nav aria-label="breadcrumb" style="margin-bottom: 2rem;">
+    <ol style="list-style: none; display: flex; gap: 0.5rem; padding: 0; margin: 0;
+               font-size: 13px; color: var(--color-muted);">
+      <li>
+        <a href="{{ url_for('products.index') }}"
+           style="color: var(--color-muted); text-decoration: none;">
+          Каталог
+        </a>
+      </li>
+      <li>→</li>
+      {% if product.category %}
+        <li>
+          <a href="{{ url_for('products.index', category=product.category) }}"
+             style="color: var(--color-muted); text-decoration: none;">
+            {{ product.category }}
+          </a>
+        </li>
+        <li>→</li>
+      {% endif %}
+      <li style="color: var(--color-text);">{{ product.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-5">
+
+    <div class="col-12 col-md-6">
+      <div style="background: var(--color-surface);
+                  aspect-ratio: 1 / 1;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  overflow: hidden;">
+        {% if product.image_filename %}
+          <img src="{{ url_for('products.uploaded_file', filename=product.image_filename) }}"
+               alt="{{ product.name }}"
+               style="width: 100%; height: 100%; object-fit: cover;">
+        {% else %}
+          <i class="bi bi-box" style="font-size: 5rem; color: var(--color-border);"></i>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 d-flex flex-column">
+
+      {% if product.category %}
+        <p style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+                  text-transform: uppercase; color: var(--color-muted);
+                  margin-bottom: 0.75rem;">
+          {{ product.category }}
+        </p>
+      {% endif %}
+
+      <h1 style="font-size: 32px; font-weight: 500; letter-spacing: -0.01em;
+                 line-height: 1.2; margin-bottom: 1rem;">
+        {{ product.name }}
+      </h1>
+
+      <p style="font-size: 28px; font-weight: 600; margin-bottom: 1.5rem;">
+        {{ "%.0f"|format(product.price_float) }} ₽
+      </p>
+
+      {% if product.description %}
+        <p style="font-size: 15px; color: var(--color-muted); line-height: 1.7;
+                  margin-bottom: 2rem; flex-grow: 1;">
+          {{ product.description }}
+        </p>
+      {% endif %}
+
+      <div style="border-top: 1px solid var(--color-border); padding-top: 1.5rem;">
+        {% if current_user.is_authenticated %}
+          <form action="{{ url_for('orders.add_to_cart', product_id=product.id) }}"
+                method="POST">
+            <div class="d-flex gap-2 align-items-center mb-3">
+              <label for="quantity"
+                     style="font-size: 12px; font-weight: 600;
+                            letter-spacing: 0.05em; text-transform: uppercase;
+                            white-space: nowrap;">
+                Количество
+              </label>
+              <input type="number"
+                     id="quantity"
+                     name="quantity"
+                     class="input-fx"
+                     value="1"
+                     min="1"
+                     max="99"
+                     style="width: 80px;">
+            </div>
+            <button type="submit" class="btn-primary-fx w-100"
+                    id="btn-add-to-cart"
+                    style="padding: 14px 32px; font-size: 15px;">
+              Добавить в корзину
+            </button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}"
+             class="btn-primary-fx d-block text-center"
+             style="padding: 14px 32px; font-size: 15px;">
+            Войдите, чтобы купить
+          </a>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
