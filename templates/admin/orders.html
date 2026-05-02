@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}CRM — Заказы | Flowrix{% endblock %}
+
+{% block extra_head %}
+<style>
+  .admin-layout { display:flex; min-height:calc(100vh - 56px - 60px); }
+  .admin-sidebar { width:220px; flex-shrink:0; border-right:1px solid var(--color-border);
+    padding:2rem 0; background:var(--color-surface); }
+  .admin-sidebar .sidebar-label { font-size:11px; font-weight:600; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--color-muted); padding:0 1.5rem; margin-bottom:0.5rem; }
+  .admin-sidebar a { display:flex; align-items:center; gap:0.6rem; padding:0.6rem 1.5rem;
+    font-size:14px; color:var(--color-text); text-decoration:none; transition:background 0.15s; }
+  .admin-sidebar a:hover, .admin-sidebar a.active { background:var(--color-border); }
+  .admin-sidebar a.active { font-weight:600; }
+  .admin-content { flex:1; padding:2.5rem 2rem; overflow-x:auto; }
+  .fx-table { width:100%; border-collapse:collapse; }
+  .fx-table th { font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--color-muted); border-bottom:1px solid var(--color-border);
+    padding:0.75rem 1rem; text-align:left; }
+  .fx-table td { font-size:14px; padding:0.875rem 1rem;
+    border-bottom:1px solid var(--color-border); vertical-align:middle; }
+  .fx-table tr:last-child td { border-bottom:none; }
+  .status-select { border:1px solid var(--color-border); border-radius:0;
+    padding:5px 8px; font-size:13px; font-family:var(--font-main);
+    background:var(--color-bg); color:var(--color-text); cursor:pointer; }
+  .status-select:focus { outline:none; border-color:var(--color-primary); }
+  .badge-status { display:inline-block; padding:3px 8px; font-size:11px;
+    font-weight:600; text-transform:uppercase; letter-spacing:0.05em; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+  {% include "admin/_sidebar.html" %}
+
+  <div class="admin-content">
+    <h1 style="font-size:22px; font-weight:600; margin-bottom:1.5rem;">Все заказы</h1>
+
+    {% if orders %}
+    <table class="fx-table">
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Клиент</th>
+          <th>Дата</th>
+          <th>Сумма</th>
+          <th>Статус</th>
+          <th style="width:200px;">Изменить статус</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td style="color:var(--color-muted);">#{{ order.id }}</td>
+          <td style="font-weight:500;">
+            {{ order.user.username if order.user else "—" }}
+            <span style="font-size:12px; color:var(--color-muted); display:block;">
+              {{ order.user.email if order.user else "" }}
+            </span>
+          </td>
+          <td style="color:var(--color-muted); white-space:nowrap;">
+            {{ order.created_at.strftime('%d.%m.%Y %H:%M') }}
+          </td>
+          <td style="font-weight:600;">{{ "%.0f"|format(order.cart_total) }} ₽</td>
+          <td>
+            {% if order.status == 'in_progress' %}
+              <span class="badge-status" style="background:#FFF3E0; color:#E65100;">В обработке</span>
+            {% elif order.status == 'shipped' %}
+              <span class="badge-status" style="background:#E3F2FD; color:#1565C0;">Отправлен</span>
+            {% elif order.status == 'delivered' %}
+              <span class="badge-status" style="background:#E8F5E9; color:#2E7D32;">Доставлен</span>
+            {% elif order.status == 'cancelled' %}
+              <span class="badge-status" style="background:#FFEBEE; color:#C62828;">Отменён</span>
+            {% else %}
+              <span class="badge-status" style="background:var(--color-border);">{{ order.status }}</span>
+            {% endif %}
+          </td>
+          <td>
+            <form action="{{ url_for('admin.order_status', order_id=order.id) }}"
+                  method="POST" class="d-flex gap-2 align-items-center">
+              <select name="status" class="status-select">
+                <option value="in_progress" {% if order.status == 'in_progress' %}selected{% endif %}>В обработке</option>
+                <option value="shipped"     {% if order.status == 'shipped'     %}selected{% endif %}>Отправлен</option>
+                <option value="delivered"   {% if order.status == 'delivered'   %}selected{% endif %}>Доставлен</option>
+                <option value="cancelled"   {% if order.status == 'cancelled'   %}selected{% endif %}>Отменён</option>
+              </select>
+              <button type="submit" class="btn-primary-fx" style="padding:5px 12px; font-size:13px;">
+                ОК
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p style="font-size:14px; color:var(--color-muted);">Заказов пока нет.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

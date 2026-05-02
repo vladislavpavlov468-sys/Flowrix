@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}CRM — Товары | Flowrix{% endblock %}
+
+{% block extra_head %}
+<style>
+  .admin-layout { display:flex; min-height:calc(100vh - 56px - 60px); }
+  .admin-sidebar { width:220px; flex-shrink:0; border-right:1px solid var(--color-border);
+    padding:2rem 0; background:var(--color-surface); }
+  .admin-sidebar .sidebar-label { font-size:11px; font-weight:600; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--color-muted); padding:0 1.5rem; margin-bottom:0.5rem; }
+  .admin-sidebar a { display:flex; align-items:center; gap:0.6rem; padding:0.6rem 1.5rem;
+    font-size:14px; color:var(--color-text); text-decoration:none; transition:background 0.15s; }
+  .admin-sidebar a:hover, .admin-sidebar a.active { background:var(--color-border); }
+  .admin-sidebar a.active { font-weight:600; }
+  .admin-content { flex:1; padding:2.5rem 2rem; overflow-x:auto; }
+  .fx-table { width:100%; border-collapse:collapse; }
+  .fx-table th { font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--color-muted); border-bottom:1px solid var(--color-border);
+    padding:0.75rem 1rem; text-align:left; }
+  .fx-table td { font-size:14px; padding:1rem; border-bottom:1px solid var(--color-border);
+    vertical-align:middle; }
+  .fx-table tr:last-child td { border-bottom:none; }
+  .badge-avail { display:inline-block; padding:3px 8px; font-size:11px; font-weight:600;
+    text-transform:uppercase; letter-spacing:0.05em; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+  {% include "admin/_sidebar.html" %}
+
+  <div class="admin-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 style="font-size:22px; font-weight:600; margin:0;">Товары</h1>
+      <a href="{{ url_for('admin.product_new') }}" class="btn-primary-fx">
+        <i class="bi bi-plus-lg me-1"></i> Добавить товар
+      </a>
+    </div>
+
+    {% if products %}
+    <table class="fx-table">
+      <thead>
+        <tr>
+          <th style="width:60px;">Фото</th>
+          <th>Название</th>
+          <th>Категория</th>
+          <th>Цена</th>
+          <th>Статус</th>
+          <th style="width:160px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td>
+            {% if p.image_filename %}
+              <img src="{{ url_for('products.uploaded_file', filename=p.image_filename) }}"
+                   style="width:48px; height:48px; object-fit:cover;">
+            {% else %}
+              <div style="width:48px; height:48px; background:var(--color-border);
+                          display:flex; align-items:center; justify-content:center;">
+                <i class="bi bi-image" style="color:var(--color-muted);"></i>
+              </div>
+            {% endif %}
+          </td>
+          <td style="font-weight:500;">{{ p.name }}</td>
+          <td style="color:var(--color-muted);">{{ p.category or "—" }}</td>
+          <td>{{ "%.0f"|format(p.price) }} ₽</td>
+          <td>
+            {% if p.is_available %}
+              <span class="badge-avail" style="background:#E8F5E9; color:#2E7D32;">Активен</span>
+            {% else %}
+              <span class="badge-avail" style="background:#FFEBEE; color:#C62828;">Скрыт</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="d-flex gap-2">
+              <a href="{{ url_for('admin.product_edit', product_id=p.id) }}"
+                 class="btn-secondary-fx" style="padding:6px 14px; font-size:13px;">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form action="{{ url_for('admin.product_toggle', product_id=p.id) }}" method="POST">
+                <button type="submit" class="btn-secondary-fx"
+                        style="padding:6px 14px; font-size:13px;"
+                        title="{{ 'Скрыть' if p.is_available else 'Показать' }}">
+                  <i class="bi bi-{{ 'eye-slash' if p.is_available else 'eye' }}"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p style="font-size:14px; color:var(--color-muted);">Товаров пока нет.
+        <a href="{{ url_for('admin.product_new') }}">Добавить первый</a>.
+      </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
