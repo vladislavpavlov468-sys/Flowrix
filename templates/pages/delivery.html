@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Доставка и оплата | Flowrix Market{% endblock %}
+
+{% block extra_head %}
+<style>
+  .page-header {
+    padding: 4rem 1.5rem;
+    text-align: center;
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .page-title {
+    font-size: 36px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+  }
+  .page-subtitle {
+    font-size: 16px;
+    color: var(--color-muted);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .content-section {
+    padding: 4rem 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .info-block {
+    margin-bottom: 3rem;
+  }
+  .info-title {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .method-card {
+    border: 1px solid var(--color-border);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  .method-icon {
+    font-size: 24px;
+    color: var(--color-primary);
+    background: var(--color-surface);
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .method-details h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .method-details p {
+    font-size: 14px;
+    color: var(--color-muted);
+    margin-bottom: 0;
+    line-height: 1.5;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title">Доставка и оплата</h1>
+    <p class="page-subtitle">Быстро, надежно и удобно. Мы заботимся о том, чтобы ваши заказы доставлялись в целости и сохранности.</p>
+  </div>
+</div>
+
+<div class="container content-section">
+  
+  <div class="info-block">
+    <h2 class="info-title">Способы доставки</h2>
+    
+    <div class="method-card">
+      <div class="method-icon"><i class="bi bi-box-seam"></i></div>
+      <div class="method-details">
+        <h4>СДЭК (Курьер или ПВЗ)</h4>
+        <p>Быстрая и надежная доставка по всей России и странам СНГ. Сроки: от 2 до 7 рабочих дней в зависимости от региона. Стоимость рассчитывается индивидуально при отправке.</p>
+      </div>
+    </div>
+
+    <div class="method-card">
+      <div class="method-icon"><i class="bi bi-mailbox"></i></div>
+      <div class="method-details">
+        <h4>Почта России</h4>
+        <p>Доступный вариант для всех регионов. Отправка первым классом или обычной посылкой. Сроки: от 3 до 14 дней. Предоставляется трек-номер для отслеживания.</p>
+      </div>
+    </div>
+
+    <div class="method-card">
+      <div class="method-icon"><i class="bi bi-shop"></i></div>
+      <div class="method-details">
+        <h4>Самовывоз</h4>
+        <p>Вы можете самостоятельно забрать заказ из нашего офиса. Услуга бесплатна. Пожалуйста, дождитесь уведомления о готовности заказа перед визитом.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-block">
+    <h2 class="info-title">Оплата</h2>
+    
+    <div class="method-card">
+      <div class="method-icon"><i class="bi bi-credit-card"></i></div>
+      <div class="method-details">
+        <h4>Банковской картой онлайн</h4>
+        <p>Оплата заказа производится онлайн после подтверждения наличия или сроков изготовления. Мы принимаем карты Visa, MasterCard, МИР.</p>
+      </div>
+    </div>
+
+    <div class="method-card">
+      <div class="method-icon"><i class="bi bi-qr-code-scan"></i></div>
+      <div class="method-details">
+        <h4>Оплата по СБП (QR-код)</h4>
+        <p>Быстрый перевод без комиссии через Систему быстрых платежей. Ссылка или QR-код предоставляются менеджером после подтверждения заказа.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-block">
+    <h2 class="info-title">Упаковка</h2>
+    <p style="font-size: 15px; line-height: 1.6; color: var(--color-text);">
+      Мы уделяем особое внимание упаковке напечатанных на 3D-принтере деталей. Каждый элемент оборачивается в защитную пленку или вспененный полиэтилен, а пустоты в коробке заполняются специальным наполнителем. Это гарантирует сохранность даже самых хрупких компонентов при транспортировке.
+    </p>
+  </div>
+
+</div>
+{% endblock %}

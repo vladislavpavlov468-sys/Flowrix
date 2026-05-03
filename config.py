@@ -3,7 +3,9 @@ import os
 
 class Config:
 
-    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-change-in-production")
+    SECRET_KEY = os.environ.get(
+        "SECRET_KEY",
+        "dev-secret-change-in-production")
 
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     SQLALCHEMY_DATABASE_URI = (

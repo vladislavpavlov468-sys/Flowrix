@@ -1,5 +1,7 @@
 from functools import wraps
-from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
+from flask import (
+    Blueprint, abort, flash, redirect, render_template, request, url_for
+)
 from flask_login import current_user, login_required
 from models import Order, Product
 from services.admin_service import (
@@ -57,7 +59,12 @@ def product_new():
             return render_template("admin/product_form.html", product=None)
 
         image_filename = save_product_image(image_file) if image_file else None
-        create_product(name, description, float(price), category, image_filename)
+        create_product(
+            name,
+            description,
+            float(price),
+            category,
+            image_filename)
         flash(f"Товар «{name}» добавлен.", "success")
         return redirect(url_for("admin.products"))
 
@@ -87,7 +94,13 @@ def product_edit(product_id: int):
                 delete_product_image(product.image_filename)
             new_image = save_product_image(image_file)
 
-        update_product(product, name, description, float(price), category, new_image)
+        update_product(
+            product,
+            name,
+            description,
+            float(price),
+            category,
+            new_image)
         flash(f"Товар «{name}» обновлён.", "success")
         return redirect(url_for("admin.products"))
 
@@ -102,6 +115,18 @@ def product_toggle(product_id: int):
     toggle_product_availability(product)
     state = "включён" if product.is_available else "скрыт"
     flash(f"Товар «{product.name}» {state}.", "success")
+    return redirect(url_for("admin.products"))
+
+
+@admin_bp.route("/products/<int:product_id>/delete", methods=["POST"])
+@login_required
+@admin_required
+def product_delete(product_id: int):
+    product = Product.query.get_or_404(product_id)
+    name = product.name
+    from services.admin_service import delete_product
+    delete_product(product)
+    flash(f"Товар «{name}» удалён.", "success")
     return redirect(url_for("admin.products"))
 
 

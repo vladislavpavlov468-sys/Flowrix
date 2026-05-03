@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Контакты | Flowrix Market{% endblock %}
+
+{% block extra_head %}
+<style>
+  .page-header {
+    padding: 4rem 1.5rem;
+    text-align: center;
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .page-title {
+    font-size: 36px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+  }
+  .page-subtitle {
+    font-size: 16px;
+    color: var(--color-muted);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .contacts-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4rem;
+    padding: 4rem 1.5rem;
+    max-width: var(--container-max);
+    margin: 0 auto;
+  }
+  
+  .contact-info {
+    flex: 1;
+    min-width: 300px;
+  }
+  .info-group {
+    margin-bottom: 2.5rem;
+  }
+  .info-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  .info-value {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+  }
+  .info-value i {
+    color: var(--color-primary);
+  }
+  
+  .contact-form-container {
+    flex: 1.5;
+    min-width: 300px;
+    background: var(--color-surface);
+    padding: 3rem;
+    border: 1px solid var(--color-border);
+  }
+  .form-title {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 2rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  .form-label-fx {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  
+  @media (max-width: 768px) {
+    .contact-form-container {
+      padding: 2rem 1.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title">Свяжитесь с нами</h1>
+    <p class="page-subtitle">Есть вопросы по 3D-печати, материалам или вашему заказу? Мы всегда готовы помочь.</p>
+  </div>
+</div>
+
+<div class="contacts-wrapper">
+  <div class="contact-info">
+    <div class="info-group">
+      <span class="info-label">Телефон</span>
+      <a href="tel:+78000000000" class="info-value">
+        <i class="bi bi-telephone"></i>
+        +7 (800) 000-00-00
+      </a>
+    </div>
+    
+    <div class="info-group">
+      <span class="info-label">Email</span>
+      <a href="mailto:support@flowrix.market" class="info-value">
+        <i class="bi bi-envelope"></i>
+        support@flowrix.market
+      </a>
+    </div>
+    
+    <div class="info-group">
+      <span class="info-label">Telegram</span>
+      <a href="#" class="info-value">
+        <i class="bi bi-telegram"></i>
+        @flowrix_support
+      </a>
+    </div>
+    
+    <div class="info-group">
+      <span class="info-label">Режим работы</span>
+      <div class="info-value" style="align-items: flex-start;">
+        <i class="bi bi-clock" style="margin-top: 4px;"></i>
+        <div>
+          Пн-Пт: 10:00 – 19:00<br>
+          <span style="font-size: 14px; color: var(--color-muted); font-weight: 400;">(МСК)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="contact-form-container">
+    <h2 class="form-title">Напишите нам</h2>
+    
+    <form action="#" method="POST" onsubmit="event.preventDefault(); alert('Функция отправки сообщения в разработке.');">
+      <div class="form-group">
+        <label for="name" class="form-label-fx">Ваше имя</label>
+        <input type="text" id="name" class="input-fx" placeholder="Иван Иванов" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="email" class="form-label-fx">Email</label>
+        <input type="email" id="email" class="input-fx" placeholder="ivan@example.com" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="subject" class="form-label-fx">Тема обращения</label>
+        <input type="text" id="subject" class="input-fx" placeholder="Вопрос по заказу #123" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="message" class="form-label-fx">Сообщение</label>
+        <textarea id="message" class="input-fx" rows="5" placeholder="Опишите ваш вопрос..." required></textarea>
+      </div>
+      
+      <button type="submit" class="btn-primary-fx w-100" style="padding: 14px;">
+        Отправить сообщение
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

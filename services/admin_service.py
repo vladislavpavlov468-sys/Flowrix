@@ -60,6 +60,20 @@ def toggle_product_availability(product: Product) -> None:
     db.session.commit()
 
 
+def delete_product(product: Product) -> None:
+    from services.product_service import delete_product_image
+    if product.image_filename:
+        delete_product_image(product.image_filename)
+
+    # If the product has orders, we delete associated order items
+    # before deleting the product itself.
+    from models import OrderItem
+    OrderItem.query.filter_by(product_id=product.id).delete()
+
+    db.session.delete(product)
+    db.session.commit()
+
+
 def update_order_status(order: Order, status: str) -> bool:
     allowed = {"in_progress", "shipped", "delivered", "cancelled"}
     if status not in allowed:

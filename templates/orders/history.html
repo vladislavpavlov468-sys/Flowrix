@@ -46,9 +46,10 @@
                              {% else %}
                                background: var(--color-border); color: var(--color-text);
                              {% endif %}">
-                  {% if order.status == 'in_progress' %}В обработке
-                  {% elif order.status == 'completed' %}Доставлен
-                  {% elif order.status == 'cancelled' %}Отменён
+                  {% if order.status == 'in_progress' %}<i class="bi bi-hourglass-split me-1"></i>В обработке
+                  {% elif order.status == 'shipped' %}<i class="bi bi-box-seam me-1"></i>Отправлен
+                  {% elif order.status == 'completed' or order.status == 'delivered' %}<i class="bi bi-check-circle me-1"></i>Доставлен
+                  {% elif order.status == 'cancelled' %}<i class="bi bi-x-circle me-1"></i>Отменён
                   {% else %}{{ order.status }}{% endif %}
                 </span>
               </div>

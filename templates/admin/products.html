@@ -77,7 +77,7 @@
           <td>
             <div class="d-flex gap-2">
               <a href="{{ url_for('admin.product_edit', product_id=p.id) }}"
-                 class="btn-secondary-fx" style="padding:6px 14px; font-size:13px;">
+                 class="btn-secondary-fx" style="padding:6px 14px; font-size:13px;" title="Редактировать">
                 <i class="bi bi-pencil"></i>
               </a>
               <form action="{{ url_for('admin.product_toggle', product_id=p.id) }}" method="POST">
@@ -85,6 +85,13 @@
                         style="padding:6px 14px; font-size:13px;"
                         title="{{ 'Скрыть' if p.is_available else 'Показать' }}">
                   <i class="bi bi-{{ 'eye-slash' if p.is_available else 'eye' }}"></i>
+                </button>
+              </form>
+              <form action="{{ url_for('admin.product_delete', product_id=p.id) }}" method="POST" onsubmit="return confirm('Вы уверены, что хотите удалить товар?');">
+                <button type="submit" class="btn-secondary-fx"
+                        style="padding:6px 14px; font-size:13px; color: var(--color-error); border-color: var(--color-error);"
+                        title="Удалить">
+                  <i class="bi bi-trash"></i>
                 </button>
               </form>
             </div>

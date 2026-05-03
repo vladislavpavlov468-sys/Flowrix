@@ -28,7 +28,7 @@ def create_app(config_class: object = Config) -> Flask:
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     with app.app_context():
-        import models
+        import models  # noqa: F401
         db.create_all()
 
     return app

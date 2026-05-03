@@ -1,7 +1,9 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-from services.order_service import add_item_to_cart, checkout_cart, get_user_orders
+from services.order_service import (
+    add_item_to_cart, checkout_cart, get_user_orders
+)
 
 orders_bp = Blueprint("orders", __name__, url_prefix="/orders")
 

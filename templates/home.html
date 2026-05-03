@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Flowrix Market — 3D-печать и технологии{% endblock %}
+
+{% block extra_head %}
+<style>
+  .hero-section {
+    padding: 6rem 1.5rem;
+    text-align: center;
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .hero-title {
+    font-size: 48px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    color: var(--color-text);
+  }
+  .hero-subtitle {
+    font-size: 18px;
+    color: var(--color-muted);
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+  }
+  
+  .features-section {
+    padding: 6rem 1.5rem;
+    max-width: var(--container-max);
+    margin: 0 auto;
+  }
+  .feature-box {
+    text-align: center;
+    padding: 2rem;
+  }
+  .feature-icon {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-primary);
+  }
+  .feature-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  .feature-desc {
+    font-size: 14px;
+    color: var(--color-muted);
+    line-height: 1.6;
+  }
+
+  .popular-section {
+    padding: 6rem 1.5rem;
+    background-color: var(--color-bg);
+    border-top: 1px solid var(--color-border);
+  }
+  .section-title {
+    font-size: 32px;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 3rem;
+    max-width: var(--container-max);
+    margin: 0 auto;
+  }
+  .product-card {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: opacity 0.2s;
+  }
+  .product-card:hover {
+    opacity: 0.8;
+  }
+  .product-img-wrapper {
+    background-color: var(--color-surface);
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .product-info {
+    text-align: center;
+  }
+  .product-name {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+  .product-price {
+    font-size: 14px;
+    color: var(--color-muted);
+  }
+
+  .cta-section {
+    padding: 8rem 1.5rem;
+    text-align: center;
+    background-color: var(--color-text);
+    color: var(--color-bg);
+  }
+  .cta-title {
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+  }
+  .cta-desc {
+    font-size: 16px;
+    color: #A1A1A6;
+    margin-bottom: 3rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .btn-inverse {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-bg);
+  }
+  .btn-inverse:hover {
+    background-color: #E5E5EA;
+    border-color: #E5E5EA;
+    color: var(--color-text);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+  <div class="container" style="max-width: var(--container-max);">
+    <h1 class="hero-title">Будущее начинается здесь.</h1>
+    <p class="hero-subtitle">
+      Flowrix Market — премиальный маркетплейс эксклюзивных деталей и корпусов, созданных с помощью передовых технологий 3D-печати. Точность, надежность и идеальный минимализм.
+    </p>
+    <a href="{{ url_for('products.index') }}" class="btn-primary-fx" style="padding: 16px 32px; font-size: 16px;">
+      Перейти в каталог
+    </a>
+  </div>
+</section>
+
+<section class="features-section container">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="feature-box">
+        <i class="bi bi-layers feature-icon"></i>
+        <h3 class="feature-title">Высочайшая точность</h3>
+        <p class="feature-desc">Мы используем современные промышленные 3D-принтеры, обеспечивающие точность до микрона для каждой детали.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="feature-box">
+        <i class="bi bi-box-seam feature-icon"></i>
+        <h3 class="feature-title">Быстрая доставка</h3>
+        <p class="feature-desc">Надежная и бережная упаковка. Оперативная отправка заказов по всей России ведущими транспортными компаниями.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="feature-box">
+        <i class="bi bi-headset feature-icon"></i>
+        <h3 class="feature-title">Экспертная поддержка</h3>
+        <p class="feature-desc">Наши инженеры всегда готовы проконсультировать вас по выбору материалов и совместимости компонентов.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="popular-section">
+  <div class="container">
+    <h2 class="section-title">Новинки каталога</h2>
+    
+    {% if featured %}
+      <div class="product-grid">
+        {% for product in featured %}
+          <a href="{{ url_for('products.detail', product_id=product.id) }}" class="product-card">
+            <div class="product-img-wrapper">
+              {% if product.image_filename %}
+                <img src="{{ url_for('products.uploaded_file', filename=product.image_filename) }}" alt="{{ product.name }}" class="product-img">
+              {% else %}
+                <i class="bi bi-box" style="font-size: 4rem; color: var(--color-muted);"></i>
+              {% endif %}
+            </div>
+            <div class="product-info">
+              <h3 class="product-name">{{ product.name }}</h3>
+              <p class="product-price">{{ "%.0f"|format(product.price) }} ₽</p>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+      <div class="text-center" style="margin-top: 4rem;">
+        <a href="{{ url_for('products.index') }}" class="btn-secondary-fx">Посмотреть все товары</a>
+      </div>
+    {% else %}
+      <p class="text-center text-muted">В каталоге пока нет товаров.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-title">Готовы к воплощению идей?</h2>
+    <p class="cta-desc">Присоединяйтесь к Flowrix Market и получите доступ к премиальным компонентам для ваших проектов.</p>
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('products.index') }}" class="btn-primary-fx btn-inverse" style="padding: 16px 32px; font-size: 16px;">
+        Каталог
+      </a>
+    {% else %}
+      <a href="{{ url_for('auth.register') }}" class="btn-primary-fx btn-inverse" style="padding: 16px 32px; font-size: 16px;">
+        Зарегистрироваться
+      </a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -5,20 +5,40 @@ if (cartOffcanvas) {
   });
 }
 
+const btnClearCart = document.getElementById("btn-clear-cart");
+if (btnClearCart) {
+  btnClearCart.addEventListener("click", function () {
+    fetch("/api/cart", { method: "DELETE" })
+      .then((response) => response.json())
+      .then(() => {
+        fetchCart();
+      })
+      .catch((error) => console.error("Ошибка при очистке корзины:", error));
+  });
+}
+
 function fetchCart() {
   const container = document.getElementById("cart-items-container");
   const totalEl = document.getElementById("cart-total");
+  const emptyMessage = document.getElementById("cart-empty-message");
+  const footer = document.getElementById("cart-footer");
 
   fetch("/api/cart")
     .then((response) => response.json())
     .then((data) => {
       if (!data.items || data.items.length === 0) {
-        container.innerHTML =
-          '<p style="font-size:14px; color: var(--color-muted);">Корзина пуста</p>';
+        container.innerHTML = "";
+        container.classList.add("d-none");
+        if (emptyMessage) emptyMessage.classList.remove("d-none");
+        if (footer) footer.classList.add("d-none");
         if (totalEl) totalEl.textContent = "0 ₽";
         updateCartCount(0);
         return;
       }
+
+      container.classList.remove("d-none");
+      if (emptyMessage) emptyMessage.classList.add("d-none");
+      if (footer) footer.classList.remove("d-none");
 
       const html = data.items
         .map(

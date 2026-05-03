@@ -19,3 +19,11 @@ def delete_cart_item(item_id: int):
     if success:
         return jsonify(get_cart_data(current_user))
     return jsonify({"error": "Item not found"}), 404
+
+
+@api_bp.route("/cart", methods=["DELETE"])
+@login_required
+def clear_user_cart():
+    from services.order_service import clear_cart
+    clear_cart(current_user)
+    return jsonify(get_cart_data(current_user))

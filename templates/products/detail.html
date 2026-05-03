@@ -112,4 +112,47 @@
   </div>
 
 </div>
+
+  {% if related %}
+  <div style="margin-top: 6rem; border-top: 1px solid var(--color-border); padding-top: 4rem;">
+    <h2 style="font-size: 24px; font-weight: 500; margin-bottom: 2rem;">Похожие товары</h2>
+    <div class="row row-cols-2 row-cols-md-3 g-4">
+      {% for product in related %}
+      <div class="col">
+        <a href="{{ url_for('products.detail', product_id=product.id) }}"
+           style="text-decoration: none; color: inherit; display: block;" class="product-card">
+          <div style="background: var(--color-surface);
+                      aspect-ratio: 1 / 1;
+                      overflow: hidden;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      margin-bottom: 0.75rem;">
+            {% if product.image_filename %}
+            <img src="{{ url_for('products.uploaded_file', filename=product.image_filename) }}"
+                 alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: cover; transition: opacity 0.15s ease;">
+            {% else %}
+            <i class="bi bi-box" style="font-size: 3rem; color: var(--color-border);"></i>
+            {% endif %}
+          </div>
+          <p style="font-size: 13px; color: var(--color-muted);
+                    letter-spacing: 0.04em; text-transform: uppercase;
+                    margin-bottom: 0.25rem;">
+            {{ product.category or "Без категории" }}
+          </p>
+          <p style="font-size: 15px; font-weight: 500; margin-bottom: 0.25rem;
+                    line-height: 1.3;">
+            {{ product.name }}
+          </p>
+          <p style="font-size: 15px; font-weight: 600; margin: 0;">
+            {{ "%.0f"|format(product.price_float) }} ₽
+          </p>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
 {% endblock %}
