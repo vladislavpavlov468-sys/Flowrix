@@ -59,6 +59,9 @@ def _register_filters(app: Flask) -> None:
         return markupsafe.Markup(str(escaped).replace('\n', '<br>\n'))
 
 
+app = create_app()
+
+
 if __name__ == "__main__":
     flask_app = create_app()
     flask_app.run(debug=True)
