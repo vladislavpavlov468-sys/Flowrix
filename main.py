@@ -26,11 +26,21 @@ def create_app(config_class: object = Config) -> Flask:
     _register_error_handlers(app)
     _register_filters(app)
 
-    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+    if os.environ.get("VERCEL"):
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////tmp/flowrix.db"
+        app.config["UPLOAD_FOLDER"] = "/tmp/uploads"
+
+    try:
+        os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+    except Exception:
+        pass
 
     with app.app_context():
         import models
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception:
+            pass
 
     return app
 
