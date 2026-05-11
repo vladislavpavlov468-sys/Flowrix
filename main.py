@@ -33,27 +33,44 @@ def create_app(config_class: object = Config) -> Flask:
 
     with app.app_context():
         import models
+        
+        # Vercel: copy existing DB from repo to /tmp if it's not there
+        if os.environ.get("VERCEL"):
+            import shutil
+            repo_db = os.path.join(Config.BASE_DIR, 'flowrix.db')
+            target_db = '/tmp/flowrix.db'
+            if os.path.exists(repo_db) and not os.path.exists(target_db):
+                try:
+                    shutil.copy2(repo_db, target_db)
+                except Exception:
+                    pass
+
         try:
             db.create_all()
-            _seed_db()
+            _ensure_admin()
         except Exception:
             pass
 
     return app
 
 
-def _seed_db():
-    from models import Product
-    if Product.query.first() is None:
-        p = Product(
-            name="Демонстрационный товар",
-            description="Этот товар был создан автоматически для проверки работы базы данных на Vercel.",
-            price=1500,
-            category="Декор",
-            is_available=True
-        )
-        db.session.add(p)
-        db.session.commit()
+def _ensure_admin():
+    """Назначает роль администратора первому пользователю или по списку."""
+    from models import User
+    # Можно добавить ваш email здесь:
+    admin_emails = ["admin@flowrix.ru", "vlad@example.com"] 
+    
+    # Делаем всех из списка админами
+    users = User.query.filter(User.email.in_(admin_emails)).all()
+    for u in users:
+        u.role = "admin"
+    
+    # Или просто сделаем самого первого зарегистрированного пользователя админом
+    first_user = User.query.first()
+    if first_user:
+        first_user.role = "admin"
+        
+    db.session.commit()
 
 
 def _register_error_handlers(app: Flask) -> None:
