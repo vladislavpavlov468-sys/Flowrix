@@ -70,7 +70,7 @@ def register():
             flash("Ошибка при создании аккаунта. Попробуйте позже.", "danger")
             return render_template("auth/register.html")
 
-        login_user(new_user)
+        login_user(new_user, remember=True)
         flash(f"Добро пожаловать, {new_user.username}!", "success")
         return redirect(url_for("products.index"))
 
