@@ -26,10 +26,6 @@ def create_app(config_class: object = Config) -> Flask:
     _register_error_handlers(app)
     _register_filters(app)
 
-    if os.environ.get("VERCEL"):
-        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////tmp/flowrix.db"
-        app.config["UPLOAD_FOLDER"] = "/tmp/uploads"
-
     try:
         os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
     except Exception:
@@ -39,10 +35,25 @@ def create_app(config_class: object = Config) -> Flask:
         import models
         try:
             db.create_all()
+            _seed_db()
         except Exception:
             pass
 
     return app
+
+
+def _seed_db():
+    from models import Product
+    if Product.query.first() is None:
+        p = Product(
+            name="Демонстрационный товар",
+            description="Этот товар был создан автоматически для проверки работы базы данных на Vercel.",
+            price=1500,
+            category="Декор",
+            is_available=True
+        )
+        db.session.add(p)
+        db.session.commit()
 
 
 def _register_error_handlers(app: Flask) -> None:
