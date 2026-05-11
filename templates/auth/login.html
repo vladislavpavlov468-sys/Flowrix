@@ -6,7 +6,7 @@
 <div class="d-flex align-items-center justify-content-center"
      style="min-height: calc(100vh - 56px - 60px); background-color: var(--color-surface);">
 
-  <div style="width: 100%; max-width: 420px;
+  <div style="width: 100%; max-width: 480px;
               background: var(--color-bg);
               border: 1px solid var(--color-border);
               padding: 2.5rem;">
@@ -37,21 +37,44 @@
                required>
       </div>
 
-      <div style="margin-bottom: 1rem;">
+      <div style="margin-bottom: 1.25rem;">
         <label for="password"
                style="font-size: 12px; font-weight: 600;
                       letter-spacing: 0.05em; text-transform: uppercase;
                       display: block; margin-bottom: 0.5rem;">
           Пароль
         </label>
-        <input type="password"
-               id="password"
-               name="password"
-               class="input-fx"
-               placeholder="Ваш пароль"
-               autocomplete="current-password"
-               required>
+        <div class="position-relative">
+          <input type="password"
+                 id="password"
+                 name="password"
+                 class="input-fx"
+                 placeholder="Ваш пароль"
+                 autocomplete="current-password"
+                 required>
+          <button type="button" 
+                  onclick="togglePassword('password', this)"
+                  class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-dark p-3"
+                  style="box-shadow: none; text-decoration: none;">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
       </div>
+
+      <script>
+        function togglePassword(id, btn) {
+          const input = document.getElementById(id);
+          const icon = btn.querySelector('i');
+          if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace('bi-eye', 'bi-eye-slash');
+          } else {
+            input.type = "password";
+            icon.classList.replace('bi-eye-slash', 'bi-eye');
+          }
+        }
+      </script>
+
 
       <div style="margin-bottom: 1.75rem; display: flex; align-items: center; gap: 0.5rem;">
         <input type="checkbox"

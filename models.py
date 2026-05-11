@@ -4,18 +4,16 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from extensions import db, login_manager
 
 
-# Загрузчик пользователя
-
 @login_manager.user_loader
 def load_user(user_id: str):
     return db.session.get(User, int(user_id))
 
 
-# Пользователи
-
 class User(UserMixin, db.Model):
-
     __tablename__ = "users"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
@@ -23,6 +21,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     role = db.Column(db.String(16), nullable=False, default="client")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     orders = db.relationship(
         "Order",
         back_populates="user",
@@ -45,15 +44,14 @@ class User(UserMixin, db.Model):
         return self.orders.filter_by(status="new").first()
 
     def __repr__(self) -> str:
-        return (
-            f"<User id={self.id} username={self.username!r} "
-            f"role={self.role!r}>"
-        )
+        return f"<User id={self.id} username={self.username!r} role={self.role!r}>"
 
 
-# Товары
 class Product(db.Model):
     __tablename__ = "products"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
@@ -63,6 +61,7 @@ class Product(db.Model):
     category = db.Column(db.String(64), nullable=True)
     is_available = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     order_items = db.relationship("OrderItem", back_populates="product")
 
     @property
@@ -73,17 +72,20 @@ class Product(db.Model):
         return f"<Product id={self.id} name={self.name!r} price={self.price}>"
 
 
-# Заказы
 class Order(db.Model):
     __tablename__ = "orders"
 
-    STATUSES = ("new", "in_progress", "shipped", "delivered")
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    STATUSES = ("new", "in_progress", "shipped", "delivered", "cancelled")
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     total_price = db.Column(db.Numeric(10, 2), nullable=True)
     status = db.Column(db.String(32), nullable=False, default="new")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     user = db.relationship("User", back_populates="orders")
     items = db.relationship(
         "OrderItem",
@@ -101,27 +103,21 @@ class Order(db.Model):
         return sum(item.quantity for item in self.items)
 
     def __repr__(self) -> str:
-        return (
-            f"<Order id={self.id} user_id={self.user_id} "
-            f"status={self.status!r} total={self.total_price}>"
-        )
+        return f"<Order id={self.id} status={self.status!r} total={self.total_price}>"
 
 
-# Позиции заказов
 class OrderItem(db.Model):
     __tablename__ = "order_items"
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(
-        db.Integer,
-        db.ForeignKey("orders.id"),
-        nullable=False)
-    product_id = db.Column(
-        db.Integer,
-        db.ForeignKey("products.id"),
-        nullable=True)
+    order_id = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=True)
     quantity = db.Column(db.Integer, nullable=False, default=1)
     price_at_purchase = db.Column(db.Numeric(10, 2), nullable=False)
+
     order = db.relationship("Order", back_populates="items")
     product = db.relationship("Product", back_populates="order_items")
 
@@ -130,7 +126,22 @@ class OrderItem(db.Model):
         return float(self.price_at_purchase) * self.quantity
 
     def __repr__(self) -> str:
-        return (
-            f"<OrderItem id={self.id} order_id={self.order_id} "
-            f"product_id={self.product_id} qty={self.quantity}>"
-        )
+        return f"<OrderItem id={self.id} order_id={self.order_id} product_id={self.product_id} qty={self.quantity}>"
+
+
+class ContactMessage(db.Model):
+    __tablename__ = "contact_messages"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    subject = db.Column(db.String(256), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(32), default="new")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self) -> str:
+        return f"<ContactMessage id={self.id} from={self.email!r} subject={self.subject!r}>"

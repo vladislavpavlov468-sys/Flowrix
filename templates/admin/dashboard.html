@@ -87,9 +87,9 @@
         <div class="stat-card__value">{{ stats.total_users }}</div>
         <div class="stat-card__label">Клиентов</div>
       </div>
-      <div class="stat-card" style="border-color: #333;">
-        <div class="stat-card__value">{{ stats.pending_orders }}</div>
-        <div class="stat-card__label">Ожидают обработки</div>
+      <div class="stat-card" style="border-color: var(--color-primary);">
+        <div class="stat-card__value">{{ stats.new_messages }}</div>
+        <div class="stat-card__label">Новых сообщений</div>
       </div>
     </div>
 
@@ -99,6 +99,9 @@
       </a>
       <a href="{{ url_for('admin.orders') }}" class="btn-secondary-fx">
         <i class="bi bi-receipt me-2"></i>Все заказы
+      </a>
+      <a href="{{ url_for('admin.messages') }}" class="btn-outline-dark rounded-0 px-4 py-2 text-decoration-none">
+        <i class="bi bi-chat-left-text me-2"></i>Сообщения
       </a>
     </div>
   </div>

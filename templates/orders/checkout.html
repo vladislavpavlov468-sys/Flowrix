@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Оформление заказа — Flowrix Market{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 1200px;">
+  
+  <div class="row g-5">
+    
+    <!-- Left Column: Form -->
+    <div class="col-12 col-lg-7" data-aos="fade-right">
+      <h2 class="font-serif mb-5">Ваш заказ</h2>
+      
+      <form action="{{ url_for('orders.checkout') }}" method="POST">
+        
+        <div class="mb-5">
+          <div class="form-check mb-4">
+            <input class="form-check-input rounded-0" type="checkbox" id="agreement" checked required>
+            <label class="form-check-label text-muted" for="agreement" style="font-size: 13px;">
+              Я согласен с условиями <a href="#" class="text-dark">договора-оферты</a>
+            </label>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Ваш Email</label>
+            <input type="email" class="form-control" value="{{ current_user.email }}" required>
+          </div>
+          
+          <div class="mb-4">
+            <label class="form-label">Ваш телефон</label>
+            <input type="tel" class="form-control" placeholder="+7 (___) ___-__-__" required>
+          </div>
+        </div>
+
+        <h4 class="font-serif mb-4 mt-5">Доставка</h4>
+        
+        <div class="mb-4">
+          <label class="form-label">Город</label>
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Найти...">
+            <span class="input-group-text bg-white rounded-0 border-start-0 text-muted"><i class="bi bi-search"></i></span>
+          </div>
+        </div>
+
+        <div class="mb-5 d-flex flex-column gap-3">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="delivery" id="del1" checked>
+            <label class="form-check-label" for="del1" style="font-size: 14px;">
+              Доставка до пункта выдачи СДЭК (0р) <span class="text-muted">от 7 дней</span>
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="delivery" id="del2">
+            <label class="form-check-label" for="del2" style="font-size: 14px;">
+              Экспресс СДЭК до пункта выдачи (+890р) <span class="text-muted">от 3 дней</span>
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="delivery" id="del3">
+            <label class="form-check-label" for="del3" style="font-size: 14px;">
+              Курьерская доставка СДЭК (+990р) <span class="text-muted">от 7 дней</span>
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="delivery" id="del4">
+            <label class="form-check-label" for="del4" style="font-size: 14px;">
+              Самовывоз из мастерской <span class="text-muted">ул. Ады Лебедевой</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Получатель (ФИО полностью)</label>
+          <input type="text" class="form-control" value="Иванов Иван Иванович" required>
+        </div>
+        
+        <div class="mb-4">
+          <label class="form-label">Адрес</label>
+          <input type="text" class="form-control" required>
+        </div>
+        
+        <div class="mb-4">
+          <label class="form-label">Комментарий</label>
+          <input type="text" class="form-control" placeholder="Комментарий к заказу">
+        </div>
+        
+        <div class="mb-4">
+          <label class="form-label text-lowercase">промокод</label>
+          <input type="text" class="form-control">
+        </div>
+
+        <h4 class="font-serif mb-4 mt-5">Способ оплаты</h4>
+        
+        <div class="mb-5 d-flex flex-column gap-3">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="payment" id="pay1" checked>
+            <label class="form-check-label" for="pay1" style="font-size: 14px;">
+              Картой (Мир, Visa, Mastercard), СБП
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="payment" id="pay2">
+            <label class="form-check-label text-muted" for="pay2" style="font-size: 14px;">
+              Оплата в пункте выдачи СДЭК
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn w-100 py-3 mt-4 text-white font-serif text-uppercase" style="background-color: #000; font-size: 14px; letter-spacing: 0.1em;">Оформить заказ</button>
+      </form>
+    </div>
+
+    <!-- Right Column: Order Summary -->
+    <div class="col-12 col-lg-5" data-aos="fade-left">
+      <div class="sticky-top" style="top: 100px;">
+        <div class="p-4" style="background: var(--color-surface);">
+          
+          <div class="d-flex flex-column gap-4 mb-4">
+            {% for item in cart.items %}
+              <div class="d-flex gap-3 align-items-center">
+                <div style="width: 60px; height: 60px; background: #fff; border: 1px solid var(--color-border);" class="d-flex align-items-center justify-content-center">
+                  {% if item.product.image_filename %}
+                    <img src="{{ url_for('products.uploaded_file', filename=item.product.image_filename) }}" alt="{{ item.product.name }}" class="w-100 h-100 object-fit-cover">
+                  {% else %}
+                    <i class="bi bi-box text-muted"></i>
+                  {% endif %}
+                </div>
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between">
+                    <p class="mb-0 fw-bold" style="font-size: 13px;">{{ item.product.name }}</p>
+                    <a href="#" class="text-muted"><i class="bi bi-x"></i></a>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mt-2">
+                    <div class="d-flex align-items-center gap-2">
+                      <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none"><i class="bi bi-dash"></i></button>
+                      <span style="font-size: 13px;">{{ item.quantity }}</span>
+                      <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none"><i class="bi bi-plus"></i></button>
+                    </div>
+                    <span style="font-size: 14px;">{{ "%.0f"|format(item.price_at_purchase * item.quantity) }} р.</span>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          
+          </div>
+            <div class="d-flex justify-content-end">
+              <span class="fw-bold fs-5">Итого: {{ "%.0f"|format(cart.cart_total) }} р.</span>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+{% endblock %}

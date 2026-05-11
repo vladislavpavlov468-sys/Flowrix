@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Оплата заказа — Flowrix Market{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 700px;">
+  
+  <div class="text-center mb-5" data-aos="fade-up">
+    <h2 class="font-serif mb-2">Оплата заказа</h2>
+    <p class="text-muted" style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em;">Заказ #{{ order_id or 'XXXXX' }}</p>
+  </div>
+
+  <div class="p-5" style="background-color: var(--color-surface);" data-aos="fade-up" data-aos-delay="100">
+    
+    <!-- Amount -->
+    <div class="text-center mb-5 pb-4 border-bottom">
+      <p class="text-muted text-uppercase mb-1" style="font-size: 11px; letter-spacing: 0.1em;">Сумма к оплате</p>
+      <div class="font-serif" style="font-size: 48px; font-weight: 600;">{{ total or '—' }} р.</div>
+    </div>
+
+    <!-- Payment Method Selection -->
+    <div id="paymentStep1">
+      <h4 class="font-serif mb-4" style="font-size: 18px;">Выберите способ оплаты</h4>
+      
+      <div class="d-flex flex-column gap-3 mb-5">
+        
+        <label class="d-flex align-items-center gap-3 p-4 border border-2 payment-method-option" style="cursor: pointer; border-color: #000 !important; background-color: #fff;">
+          <input class="form-check-input m-0 flex-shrink-0" type="radio" name="payMethod" value="card" checked>
+          <div class="d-flex align-items-center gap-2 flex-grow-1">
+            <i class="bi bi-credit-card-2-front fs-4"></i>
+            <div>
+              <div class="fw-bold" style="font-size: 14px;">Картой онлайн</div>
+              <div class="text-muted" style="font-size: 12px;">Visa, Mastercard, Мир, СБП</div>
+            </div>
+          </div>
+        </label>
+
+        <label class="d-flex align-items-center gap-3 p-4 border payment-method-option" style="cursor: pointer; background-color: #fff;">
+          <input class="form-check-input m-0 flex-shrink-0" type="radio" name="payMethod" value="sbp">
+          <div class="d-flex align-items-center gap-2 flex-grow-1">
+            <i class="bi bi-phone fs-4"></i>
+            <div>
+              <div class="fw-bold" style="font-size: 14px;">СБП — Система быстрых платежей</div>
+              <div class="text-muted" style="font-size: 12px;">Оплата по QR-коду</div>
+            </div>
+          </div>
+        </label>
+
+        <label class="d-flex align-items-center gap-3 p-4 border payment-method-option" style="cursor: pointer; background-color: #fff;">
+          <input class="form-check-input m-0 flex-shrink-0" type="radio" name="payMethod" value="pickup">
+          <div class="d-flex align-items-center gap-2 flex-grow-1">
+            <i class="bi bi-shop fs-4"></i>
+            <div>
+              <div class="fw-bold" style="font-size: 14px;">Оплата при получении</div>
+              <div class="text-muted" style="font-size: 12px;">Наличными или картой в пункте выдачи СДЭК</div>
+            </div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Card Form (shown by default) -->
+      <div id="cardForm" class="mb-5">
+        <div class="row g-3 mb-3">
+          <div class="col-12">
+            <label class="form-label">Номер карты</label>
+            <input type="text" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19" id="cardNumber">
+          </div>
+        </div>
+        <div class="row g-3">
+          <div class="col-8">
+            <label class="form-label">Срок действия</label>
+            <input type="text" class="form-control" placeholder="MM / YY" maxlength="7">
+          </div>
+          <div class="col-4">
+            <label class="form-label">CVV</label>
+            <input type="text" class="form-control" placeholder="000" maxlength="3">
+          </div>
+        </div>
+      </div>
+
+      <button onclick="simulatePayment()" class="btn w-100 py-3 text-white text-uppercase rounded-0 fw-bold" style="background-color: #000; font-size: 13px; letter-spacing: 0.08em;">
+        Оплатить {{ total or '—' }} р.
+      </button>
+    </div>
+
+    <!-- Success State (hidden) -->
+    <div id="paymentSuccess" class="text-center py-4 d-none">
+      <div class="mb-4">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+      </div>
+      <h3 class="font-serif mb-2">Оплата прошла успешно!</h3>
+      <p class="text-muted mb-4" style="font-size: 14px;">Заказ принят в обработку. Мы отправим вам уведомление на email.</p>
+      <a href="{{ url_for('orders.history') }}" class="btn text-dark text-uppercase text-decoration-none me-3" style="font-size: 12px; letter-spacing: 0.1em; border-bottom: 1px solid #111;">
+        История заказов
+      </a>
+      <a href="{{ url_for('products.index') }}" class="btn btn-outline-dark rounded-0 text-uppercase" style="font-size: 12px; letter-spacing: 0.05em;">
+        В каталог
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.payment-method-option:has(input:checked) {
+  border-color: #000 !important;
+  border-width: 2px !important;
+}
+</style>
+
+<script>
+// Card number formatting
+document.getElementById('cardNumber')?.addEventListener('input', function(e) {
+  let v = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+  let matches = v.match(/\d{4,16}/g);
+  let match = matches && matches[0] || '';
+  let parts = [];
+  for (let i = 0, len = match.length; i < len; i += 4) {
+    parts.push(match.substring(i, i + 4));
+  }
+  e.target.value = parts.length ? parts.join(' ') : v;
+});
+
+// Radio selection styling
+document.querySelectorAll('input[name="payMethod"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    const cardForm = document.getElementById('cardForm');
+    if (this.value === 'card') {
+      cardForm.style.display = 'block';
+    } else {
+      cardForm.style.display = 'none';
+    }
+  });
+});
+
+// Simulate payment success
+function simulatePayment() {
+  document.getElementById('paymentStep1').classList.add('d-none');
+  const success = document.getElementById('paymentSuccess');
+  success.classList.remove('d-none');
+  success.style.opacity = 0;
+  success.style.transition = 'opacity 0.6s ease';
+  setTimeout(() => { success.style.opacity = 1; }, 50);
+}
+</script>
+{% endblock %}

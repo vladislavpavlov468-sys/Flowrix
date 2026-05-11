@@ -3,7 +3,7 @@ from flask import (
     Blueprint, abort, flash, redirect, render_template, request, url_for
 )
 from flask_login import current_user, login_required
-from models import Order, Product
+from models import Order, Product, ContactMessage
 from services.admin_service import (
     create_product,
     get_all_orders,
@@ -12,6 +12,7 @@ from services.admin_service import (
     toggle_product_availability,
     update_order_status,
     update_product,
+    delete_product
 )
 from services.product_service import delete_product_image, save_product_image
 
@@ -124,7 +125,6 @@ def product_toggle(product_id: int):
 def product_delete(product_id: int):
     product = Product.query.get_or_404(product_id)
     name = product.name
-    from services.admin_service import delete_product
     delete_product(product)
     flash(f"Товар «{name}» удалён.", "success")
     return redirect(url_for("admin.products"))
@@ -149,3 +149,23 @@ def order_status(order_id: int):
     else:
         flash("Недопустимый статус.", "danger")
     return redirect(url_for("admin.orders"))
+
+
+@admin_bp.route("/messages")
+@login_required
+@admin_required
+def messages():
+    all_messages = ContactMessage.query.order_by(ContactMessage.created_at.desc()).all()
+    return render_template("admin/messages.html", messages=all_messages)
+
+
+@admin_bp.route("/messages/<int:message_id>/read", methods=["POST"])
+@login_required
+@admin_required
+def message_read(message_id: int):
+    from extensions import db
+    msg = ContactMessage.query.get_or_404(message_id)
+    msg.status = "read"
+    db.session.commit()
+    flash("Сообщение помечено как прочитанное.", "success")
+    return redirect(url_for("admin.messages"))

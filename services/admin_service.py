@@ -1,21 +1,26 @@
 from extensions import db
-from models import Order, Product, User
+from models import Order, Product, User, ContactMessage, OrderItem
 
 
 def get_dashboard_stats() -> dict:
+    """Получение агрегированной статистики для дашборда CRM."""
     total_products = Product.query.filter_by(is_available=True).count()
     total_orders = Order.query.filter(Order.status != "new").count()
     total_users = User.query.filter_by(role="client").count()
     pending_orders = Order.query.filter_by(status="in_progress").count()
+    new_messages = ContactMessage.query.filter_by(status="new").count()
+
     return {
         "total_products": total_products,
         "total_orders": total_orders,
         "total_users": total_users,
         "pending_orders": pending_orders,
+        "new_messages": new_messages,
     }
 
 
 def get_all_orders() -> list[Order]:
+    """Получение всех оформленных заказов."""
     return (
         Order.query
         .filter(Order.status != "new")
@@ -25,11 +30,13 @@ def get_all_orders() -> list[Order]:
 
 
 def get_all_products() -> list[Product]:
+    """Получение списка всех товаров."""
     return Product.query.order_by(Product.created_at.desc()).all()
 
 
 def create_product(name: str, description: str, price: float,
                    category: str, image_filename: str | None) -> Product:
+    """Создание нового товара."""
     product = Product(
         name=name,
         description=description,
@@ -46,6 +53,7 @@ def create_product(name: str, description: str, price: float,
 def update_product(product: Product, name: str, description: str,
                    price: float, category: str,
                    image_filename: str | None) -> None:
+    """Обновление данных товара."""
     product.name = name
     product.description = description
     product.price = price
@@ -56,18 +64,18 @@ def update_product(product: Product, name: str, description: str,
 
 
 def toggle_product_availability(product: Product) -> None:
+    """Переключение доступности товара."""
     product.is_available = not product.is_available
     db.session.commit()
 
 
 def delete_product(product: Product) -> None:
+    """Полное удаление товара и связанных данных."""
     from services.product_service import delete_product_image
     if product.image_filename:
         delete_product_image(product.image_filename)
 
-    # If the product has orders, we delete associated order items
-    # before deleting the product itself.
-    from models import OrderItem
+    # Удаляем связанные позиции в заказах
     OrderItem.query.filter_by(product_id=product.id).delete()
 
     db.session.delete(product)
@@ -75,6 +83,7 @@ def delete_product(product: Product) -> None:
 
 
 def update_order_status(order: Order, status: str) -> bool:
+    """Обновление статуса заказа."""
     allowed = {"in_progress", "shipped", "delivered", "cancelled"}
     if status not in allowed:
         return False

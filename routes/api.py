@@ -11,11 +11,18 @@ api_bp = Blueprint("api", __name__, url_prefix="/api")
 def get_cart():
     return jsonify(get_cart_data(current_user))
 
+    return jsonify({"error": "Item not found"}), 404
 
-@api_bp.route("/cart/<int:item_id>", methods=["DELETE"])
+
+@api_bp.route("/cart/<int:item_id>", methods=["PATCH"])
 @login_required
-def delete_cart_item(item_id: int):
-    success = remove_item_from_cart(current_user, item_id)
+def update_cart_item_quantity(item_id: int):
+    from flask import request
+    data = request.get_json()
+    delta = data.get("delta", 0)
+
+    from services.order_service import update_item_quantity
+    success = update_item_quantity(current_user, item_id, delta)
     if success:
         return jsonify(get_cart_data(current_user))
     return jsonify({"error": "Item not found"}), 404

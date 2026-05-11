@@ -1,9 +1,9 @@
 from flask import (
     Blueprint, abort, current_app, render_template, request,
-    send_from_directory
+    send_from_directory, flash, redirect, url_for
 )
-
-from models import Product
+from extensions import db
+from models import Product, ContactMessage
 from services.product_service import get_all_categories, get_products_filtered
 
 products_bp = Blueprint("products", __name__)
@@ -59,6 +59,35 @@ def delivery():
 @products_bp.route("/contacts")
 def contacts():
     return render_template("pages/contacts.html")
+
+
+@products_bp.route("/contacts/submit", methods=["POST"])
+def contact_submit():
+    name = request.form.get("name")
+    email = request.form.get("email")
+    subject = request.form.get("subject")
+    message = request.form.get("message")
+
+    if not all([name, email, subject, message]):
+        flash("Пожалуйста, заполните все поля.", "danger")
+        return redirect(url_for("products.contacts"))
+
+    new_msg = ContactMessage(
+        name=name,
+        email=email,
+        subject=subject,
+        message=message
+    )
+
+    try:
+        db.session.add(new_msg)
+        db.session.commit()
+        flash("Ваше сообщение успешно отправлено!", "success")
+    except Exception:
+        db.session.rollback()
+        flash("Произошла ошибка при отправке. Попробуйте позже.", "danger")
+
+    return redirect(url_for("products.contacts"))
 
 
 @products_bp.route("/uploads/<path:filename>")

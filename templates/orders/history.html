@@ -3,105 +3,80 @@
 {% block title %}История заказов — Flowrix Market{% endblock %}
 
 {% block content %}
-<div style="max-width: var(--container-max); margin: 0 auto; padding: 3rem 1.5rem;">
-
-  <div class="d-flex align-items-baseline justify-content-between mb-5"
-       style="border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
-    <h1 style="font-size: 28px; font-weight: 500; margin: 0;">Мои заказы</h1>
-    <span style="font-size: 14px; color: var(--color-muted);">
-      {{ orders|length }} заказов
-    </span>
+<div class="container py-5" style="max-width: 900px;">
+  
+  <div class="mb-5 d-flex align-items-center justify-content-between" data-aos="fade-up">
+    <h2 class="font-serif mb-0">История заказов</h2>
+    <a href="{{ url_for('auth.profile') }}" class="text-dark text-uppercase text-decoration-none" style="font-size: 12px; letter-spacing: 0.1em; border-bottom: 1px solid #111;">
+      Назад в профиль
+    </a>
   </div>
 
   {% if orders %}
-    <div class="row g-4">
+    <div class="d-flex flex-column gap-4">
       {% for order in orders %}
-        <div class="col-12">
-          <div style="background: var(--color-surface); padding: 2rem;">
-            <div class="d-flex justify-content-between align-items-center mb-4"
-                 style="border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
+        <div class="card border-0 rounded-0" style="background-color: var(--color-surface);" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+          <div class="card-body p-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom">
               <div>
-                <p style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
-                          text-transform: uppercase; color: var(--color-muted);
-                          margin-bottom: 0.25rem;">
-                  Заказ №{{ order.id }}
-                </p>
-                <p style="font-size: 14px; margin: 0;">
-                  от {{ order.created_at.strftime('%d.%m.%Y %H:%M') }}
-                </p>
+                <span class="text-muted text-uppercase me-3" style="font-size: 11px; letter-spacing: 0.1em;">Заказ #{{ order.id }}</span>
+                <span class="fw-bold" style="font-size: 14px;">{{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
               </div>
-              <div class="text-end">
-                <p style="font-size: 18px; font-weight: 600; margin-bottom: 0.25rem;">
-                  {{ "%.0f"|format(order.cart_total) }} ₽
-                </p>
-                <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.05em;
-                             text-transform: uppercase;
-                             padding: 4px 8px;
-                             {% if order.status == 'completed' %}
-                               background: #E8F5E9; color: #2E7D32;
-                             {% elif order.status == 'in_progress' %}
-                               background: #FFF3E0; color: #EF6C00;
-                             {% elif order.status == 'cancelled' %}
-                               background: #FFEBEE; color: #C62828;
-                             {% else %}
-                               background: var(--color-border); color: var(--color-text);
-                             {% endif %}">
-                  {% if order.status == 'in_progress' %}<i class="bi bi-hourglass-split me-1"></i>В обработке
-                  {% elif order.status == 'shipped' %}<i class="bi bi-box-seam me-1"></i>Отправлен
-                  {% elif order.status == 'completed' or order.status == 'delivered' %}<i class="bi bi-check-circle me-1"></i>Доставлен
-                  {% elif order.status == 'cancelled' %}<i class="bi bi-x-circle me-1"></i>Отменён
-                  {% else %}{{ order.status }}{% endif %}
-                </span>
+              <div>
+                {% if order.status == 'new' %}
+                  <span class="badge rounded-0 bg-dark fw-normal text-uppercase px-3 py-2" style="font-size: 10px; letter-spacing: 0.05em;">В обработке</span>
+                {% elif order.status == 'in_progress' %}
+                  <span class="badge rounded-0 bg-info fw-normal text-uppercase px-3 py-2" style="font-size: 10px; letter-spacing: 0.05em;">Оплачен / Доставка</span>
+                {% elif order.status == 'shipped' %}
+                  <span class="badge rounded-0 bg-primary fw-normal text-uppercase px-3 py-2" style="font-size: 10px; letter-spacing: 0.05em;">Отправлен</span>
+                {% elif order.status == 'delivered' %}
+                  <span class="badge rounded-0 bg-success fw-normal text-uppercase px-3 py-2" style="font-size: 10px; letter-spacing: 0.05em;">Доставлен</span>
+                {% elif order.status == 'completed' %}
+                  <span class="badge rounded-0 bg-success fw-normal text-uppercase px-3 py-2" style="font-size: 10px; letter-spacing: 0.05em;">Выполнен</span>
+                {% else %}
+                  <span class="badge rounded-0 bg-secondary fw-normal text-uppercase px-3 py-2" style="font-size: 10px; letter-spacing: 0.05em;">{{ order.status }}</span>
+                {% endif %}
               </div>
             </div>
 
-            <div class="d-flex flex-column gap-3">
+            <div class="d-flex flex-column gap-3 mb-4">
               {% for item in order.items %}
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="d-flex align-items-center gap-3">
-                    <div style="width: 48px; height: 48px; background: var(--color-bg);
-                                display: flex; align-items: center; justify-content: center;">
-                      {% if item.product and item.product.image_filename %}
-                        <img src="{{ url_for('products.uploaded_file', filename=item.product.image_filename) }}"
-                             alt="Фото" style="max-width: 100%; max-height: 100%;">
-                      {% else %}
-                        <i class="bi bi-box" style="color: var(--color-muted);"></i>
-                      {% endif %}
-                    </div>
-                    <div>
-                      <p style="font-size: 14px; font-weight: 500; margin: 0;">
-                        {{ item.product.name if item.product else 'Удалённый товар' }}
-                      </p>
-                      <p style="font-size: 13px; color: var(--color-muted); margin: 0;">
-                        {{ "%.0f"|format(item.price_at_purchase) }} ₽ × {{ item.quantity }}
-                      </p>
-                    </div>
+                <div class="d-flex align-items-center gap-3">
+                  <div style="width: 50px; height: 50px; background: #fff; border: 1px solid var(--color-border);" class="d-flex align-items-center justify-content-center">
+                    {% if item.product.image_filename %}
+                      <img src="{{ url_for('products.uploaded_file', filename=item.product.image_filename) }}" alt="{{ item.product.name }}" class="w-100 h-100 object-fit-cover">
+                    {% else %}
+                      <i class="bi bi-box text-muted"></i>
+                    {% endif %}
                   </div>
-                  <p style="font-size: 14px; font-weight: 600; margin: 0;">
-                    {{ "%.0f"|format(item.subtotal) }} ₽
-                  </p>
+                  <div class="flex-grow-1">
+                    <p class="mb-0 fw-bold" style="font-size: 14px;">{{ item.product.name }}</p>
+                    <p class="text-muted mb-0" style="font-size: 12px;">{{ item.quantity }} шт. × {{ "%.0f"|format(item.price_at_purchase) }} р.</p>
+                  </div>
+                  <div>
+                    <span class="fw-bold">{{ "%.0f"|format(item.price_at_purchase * item.quantity) }} р.</span>
+                  </div>
                 </div>
               {% endfor %}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+              <span class="text-muted text-uppercase" style="font-size: 11px; letter-spacing: 0.1em;">Итого</span>
+              <span class="font-serif fs-5 fw-bold">{{ "%.0f"|format(order.cart_total) }} р.</span>
             </div>
           </div>
         </div>
       {% endfor %}
     </div>
-
   {% else %}
-    <div class="text-center" style="padding: 6rem 2rem;">
-      <i class="bi bi-bag-x" style="font-size: 3rem; color: var(--color-border); margin-bottom: 1rem;"></i>
-      <p style="font-size: 16px; font-weight: 500; margin-bottom: 0.5rem;">
-        У вас пока нет заказов
-      </p>
-      <p style="font-size: 14px; color: var(--color-muted); margin-bottom: 1.5rem;">
-        Добавьте товары в корзину и оформите первый заказ
-      </p>
-      <a href="{{ url_for('products.index') }}" class="btn-primary-fx" style="padding: 10px 24px;">
+    <div class="text-center py-5" style="background-color: var(--color-surface);" data-aos="fade-up">
+      <i class="bi bi-bag-x text-muted fs-1 d-block mb-3"></i>
+      <h4 class="font-serif mb-3">У вас пока нет заказов</h4>
+      <a href="{{ url_for('products.index') }}" class="btn btn-outline-dark rounded-0 py-2 px-4 text-uppercase" style="font-size: 12px; letter-spacing: 0.05em;">
         Перейти в каталог
       </a>
     </div>
   {% endif %}
-
+  
 </div>
 {% endblock %}

@@ -1,7 +1,13 @@
 import os
-from flask import Flask
+import markupsafe
+from flask import Flask, render_template
 from config import Config
 from extensions import db, login_manager
+from routes.auth import auth_bp
+from routes.products import products_bp
+from routes.orders import orders_bp
+from routes.admin import admin_bp
+from routes.api import api_bp
 
 
 def create_app(config_class: object = Config) -> Flask:
@@ -11,12 +17,6 @@ def create_app(config_class: object = Config) -> Flask:
     db.init_app(app)
     login_manager.init_app(app)
 
-    from routes.auth import auth_bp
-    from routes.products import products_bp
-    from routes.orders import orders_bp
-    from routes.admin import admin_bp
-    from routes.api import api_bp
-
     app.register_blueprint(auth_bp)
     app.register_blueprint(products_bp)
     app.register_blueprint(orders_bp)
@@ -24,19 +24,18 @@ def create_app(config_class: object = Config) -> Flask:
     app.register_blueprint(api_bp)
 
     _register_error_handlers(app)
+    _register_filters(app)
 
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     with app.app_context():
-        import models  # noqa: F401
+        import models
         db.create_all()
 
     return app
 
 
 def _register_error_handlers(app: Flask) -> None:
-    from flask import render_template
-
     @app.errorhandler(403)
     def forbidden(error):
         return render_template("errors/403.html"), 403
@@ -49,6 +48,15 @@ def _register_error_handlers(app: Flask) -> None:
     def internal_error(error):
         db.session.rollback()
         return render_template("errors/500.html"), 500
+
+
+def _register_filters(app: Flask) -> None:
+    @app.template_filter('nl2br')
+    def nl2br_filter(value):
+        if not value:
+            return ''
+        escaped = markupsafe.escape(value)
+        return markupsafe.Markup(str(escaped).replace('\n', '<br>\n'))
 
 
 if __name__ == "__main__":

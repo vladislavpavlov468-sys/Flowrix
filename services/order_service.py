@@ -47,6 +47,19 @@ def remove_item_from_cart(user: User, item_id: int) -> bool:
     return False
 
 
+def update_item_quantity(user: User, item_id: int, delta: int) -> bool:
+    cart = get_or_create_cart(user)
+    item = OrderItem.query.filter_by(id=item_id, order_id=cart.id).first()
+
+    if item:
+        item.quantity += delta
+        if item.quantity <= 0:
+            db.session.delete(item)
+        db.session.commit()
+        return True
+    return False
+
+
 def clear_cart(user: User) -> bool:
     cart = get_or_create_cart(user)
     if cart.items:
@@ -84,6 +97,7 @@ def get_cart_data(user: User) -> dict:
                 "id": item.id,
                 "product_id": item.product.id,
                 "product_name": item.product.name,
+                "product_image": item.product.image_filename,
                 "price": float(item.price_at_purchase),
                 "quantity": item.quantity,
                 "subtotal": item.subtotal

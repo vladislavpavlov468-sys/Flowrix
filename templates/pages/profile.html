@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Профиль — Flowrix Market{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 800px;">
+  
+  <div class="text-center mb-5" data-aos="fade-up">
+    <h2 class="font-serif mb-3">Ваш Профиль</h2>
+    <p class="text-muted text-uppercase" style="font-size: 12px; letter-spacing: 0.1em;">Добро пожаловать, {{ current_user.username }}</p>
+  </div>
+
+  <div class="row g-4 justify-content-center">
+    <div class="col-12 col-md-8">
+      <div class="card border-0 rounded-0" style="background-color: var(--color-surface);" data-aos="fade-up" data-aos-delay="100">
+        <div class="card-body p-5 text-center">
+          
+          <div class="mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white shadow-sm mb-3" style="width: 80px; height: 80px;">
+              <span class="font-serif fs-2">{{ current_user.username[0]|upper }}</span>
+            </div>
+            <h4 class="font-serif">{{ current_user.username }}</h4>
+            <p class="text-muted">{{ current_user.email }}</p>
+          </div>
+
+          <div class="d-flex flex-column gap-3 mx-auto" style="max-width: 300px;">
+            <a href="{{ url_for('orders.history') }}" class="btn btn-outline-dark rounded-0 py-3 text-uppercase" style="font-size: 12px; letter-spacing: 0.05em;">
+              История заказов
+            </a>
+            
+            {% if current_user.is_admin %}
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-dark rounded-0 py-3 text-uppercase" style="font-size: 12px; letter-spacing: 0.05em;">
+              Управление магазином (CRM)
+            </a>
+            {% endif %}
+            
+            <a href="{{ url_for('auth.logout') }}" class="text-danger mt-3 text-uppercase text-decoration-none" style="font-size: 12px; letter-spacing: 0.05em; border-bottom: 1px solid #dc3545; display: inline-block; padding-bottom: 2px;">
+              Выйти из аккаунта
+            </a>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

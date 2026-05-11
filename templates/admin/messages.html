@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Сообщения CRM — Flowrix Market{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex align-items-center justify-content-between mb-5" data-aos="fade-up">
+    <div>
+      <h2 class="font-serif mb-1">CRM: Сообщения</h2>
+      <p class="text-muted mb-0">Вопросы и предложения от клиентов</p>
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-dark rounded-0 px-4">
+      В дашборд
+    </a>
+  </div>
+
+  {% if messages %}
+    <div class="table-responsive" data-aos="fade-up">
+      <table class="table table-hover align-middle border-top">
+        <thead class="bg-light">
+          <tr style="font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">
+            <th class="py-3 px-4">Дата</th>
+            <th class="py-3 px-4">Клиент</th>
+            <th class="py-3 px-4">Тема</th>
+            <th class="py-3 px-4">Сообщение</th>
+            <th class="py-3 px-4 text-end">Действие</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for msg in messages %}
+            <tr>
+              <td class="py-3 px-4 text-muted" style="font-size: 13px;">
+                {{ msg.created_at.strftime('%d.%m.%Y %H:%M') }}
+              </td>
+              <td class="py-3 px-4">
+                <div class="fw-bold">{{ msg.name }}</div>
+                <div class="text-muted" style="font-size: 12px;">{{ msg.email }}</div>
+              </td>
+              <td class="py-3 px-4 fw-medium">{{ msg.subject }}</td>
+              <td class="py-3 px-4">
+                <div class="text-truncate" style="max-width: 300px;" title="{{ msg.message }}">
+                  {{ msg.message }}
+                </div>
+              </td>
+              <td class="py-3 px-4 text-end">
+                {% if msg.status == 'new' %}
+                  <form action="{{ url_for('admin.message_read', message_id=msg.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-dark rounded-0 px-3" style="font-size: 11px;">
+                      Прочитать
+                    </button>
+                  </form>
+                {% else %}
+                  <span class="text-muted" style="font-size: 11px;">Просмотрено</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="text-center py-5 bg-light" data-aos="fade-up">
+      <i class="bi bi-chat-left-dots text-muted fs-1 mb-3"></i>
+      <h4 class="font-serif">Сообщений пока нет</h4>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

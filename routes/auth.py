@@ -1,3 +1,4 @@
+import re
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from extensions import db
@@ -18,8 +19,11 @@ def _validate_registration(
     if len(username) < 3:
         errors.append("Имя пользователя должно содержать минимум 3 символа.")
 
-    if len(password) < 6:
-        errors.append("Пароль должен содержать минимум 6 символов.")
+    if len(password) < 8:
+        errors.append("Пароль должен содержать минимум 8 символов.")
+
+    if not re.search(r"[A-Za-z]", password) or not re.search(r"\d", password) or not re.search(r"[@$!%*#?&]", password):
+        errors.append("Пароль должен содержать буквы, цифры и специальные знаки.")
 
     if password != confirm:
         errors.append("Пароли не совпадают.")
@@ -104,3 +108,9 @@ def logout():
     logout_user()
     flash("Вы успешно вышли из системы.", "info")
     return redirect(url_for("auth.login"))
+
+
+@auth_bp.route("/profile")
+@login_required
+def profile():
+    return render_template("pages/profile.html")
