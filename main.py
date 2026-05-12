@@ -83,8 +83,13 @@ def _register_filters(app: Flask) -> None:
     def nl2br_filter(s):
         if not s:
             return ""
-        from markupsafe import escape, Markup
-        return Markup(escape(s).replace("\n", "<br>\n"))
+        from markupsafe import Markup
+        if "<br>" in s or "<p>" in s:
+            return Markup(s)
+        return Markup(s.replace("\n", "<br>\n"))
 
 
 app = create_app()
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)

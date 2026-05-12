@@ -3,7 +3,6 @@ from models import Order, Product, User, ContactMessage, OrderItem
 
 
 def get_dashboard_stats() -> dict:
-    """Получение агрегированной статистики для дашборда CRM."""
     total_products = Product.query.filter_by(is_available=True).count()
     total_orders = Order.query.filter(Order.status != "new").count()
     total_users = User.query.filter_by(role="client").count()
@@ -20,7 +19,6 @@ def get_dashboard_stats() -> dict:
 
 
 def get_all_orders() -> list[Order]:
-    """Получение всех оформленных заказов."""
     return (
         Order.query
         .filter(Order.status != "new")
@@ -30,13 +28,13 @@ def get_all_orders() -> list[Order]:
 
 
 def get_all_products() -> list[Product]:
-    """Получение списка всех товаров."""
     return Product.query.order_by(Product.created_at.desc()).all()
 
 
 def create_product(name: str, description: str, price: float,
-                   category: str, image_filename: str | None) -> Product:
-    """Создание нового товара."""
+                   category: str, image_filename: str | None,
+                   extra_filenames: list[str] | None = None) -> Product:
+    from models import ProductImage
     product = Product(
         name=name,
         description=description,
@@ -46,6 +44,13 @@ def create_product(name: str, description: str, price: float,
         is_available=True,
     )
     db.session.add(product)
+    db.session.flush() 
+
+    if extra_filenames:
+        for fname in extra_filenames:
+            img_obj = ProductImage(product_id=product.id, filename=fname)
+            db.session.add(img_obj)
+
     db.session.commit()
     return product
 
@@ -53,7 +58,6 @@ def create_product(name: str, description: str, price: float,
 def update_product(product: Product, name: str, description: str,
                    price: float, category: str,
                    image_filename: str | None) -> None:
-    """Обновление данных товара."""
     product.name = name
     product.description = description
     product.price = price
@@ -64,18 +68,15 @@ def update_product(product: Product, name: str, description: str,
 
 
 def toggle_product_availability(product: Product) -> None:
-    """Переключение доступности товара."""
     product.is_available = not product.is_available
     db.session.commit()
 
 
 def delete_product(product: Product) -> None:
-    """Полное удаление товара и связанных данных."""
     from services.product_service import delete_product_image
     if product.image_filename:
         delete_product_image(product.image_filename)
 
-    # Удаляем связанные позиции в заказах
     OrderItem.query.filter_by(product_id=product.id).delete()
 
     db.session.delete(product)
@@ -83,7 +84,6 @@ def delete_product(product: Product) -> None:
 
 
 def update_order_status(order: Order, status: str) -> bool:
-    """Обновление статуса заказа."""
     allowed = {"in_progress", "shipped", "delivered", "cancelled"}
     if status not in allowed:
         return False

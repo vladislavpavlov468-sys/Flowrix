@@ -15,35 +15,66 @@
     
     <!-- Left: Image Gallery -->
     <div class="col-12 col-md-6" data-aos="fade-right">
-      <div class="position-relative bg-surface d-flex align-items-center justify-content-center mb-3" style="aspect-ratio: 1; overflow: hidden;">
+      <div class="position-relative bg-surface d-flex align-items-center justify-content-center mb-3" style="aspect-ratio: 1; overflow: hidden; group">
         {% if product.image_filename %}
           <img src="{{ url_for('products.uploaded_file', filename=product.image_filename) }}" 
                alt="{{ product.name }}" 
                class="w-100 h-100 object-fit-cover" 
-               id="mainImage"
+               id="mainProductImage"
                onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'bi bi-box text-muted\' style=\'font-size: 5rem;\'></i>'">
+          
+          <!-- Arrows -->
+          <button class="btn btn-light position-absolute start-0 ms-3 rounded-circle shadow-sm d-flex align-items-center justify-content-center" 
+                  style="width: 40px; height: 40px; opacity: 0.7; z-index: 10;" onclick="prevImage()">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <button class="btn btn-light position-absolute end-0 me-3 rounded-circle shadow-sm d-flex align-items-center justify-content-center" 
+                  style="width: 40px; height: 40px; opacity: 0.7; z-index: 10;" onclick="nextImage()">
+            <i class="bi bi-chevron-right"></i>
+          </button>
         {% else %}
           <i class="bi bi-box text-muted" style="font-size: 5rem;"></i>
         {% endif %}
-        
-        <!-- Placeholder arrows for carousel -->
-        <button class="btn btn-light position-absolute start-0 ms-3 rounded-circle shadow-sm" style="width: 40px; height: 40px; opacity: 0.8;"><i class="bi bi-chevron-left"></i></button>
-        <button class="btn btn-light position-absolute end-0 me-3 rounded-circle shadow-sm" style="width: 40px; height: 40px; opacity: 0.8;"><i class="bi bi-chevron-right"></i></button>
       </div>
       
-      <!-- Thumbnails (Placeholder for design) -->
-      <div class="d-flex gap-2 overflow-auto" style="scrollbar-width: none;">
-        {% if product.image_filename %}
-        <div style="width: 80px; height: 80px; cursor: pointer; border: 2px solid #000;" class="flex-shrink-0">
-          <img src="{{ url_for('products.uploaded_file', filename=product.image_filename) }}" class="w-100 h-100 object-fit-cover">
+      <!-- Thumbnails -->
+      <div class="d-flex gap-2 overflow-auto pb-2" style="scrollbar-width: none;" id="thumbnailContainer">
+        {% set all_images = [] %}
+        {% if product.image_filename %}{% set _ = all_images.append(url_for('products.uploaded_file', filename=product.image_filename)) %}{% endif %}
+        {% for img in product.images %}{% set _ = all_images.append(url_for('products.uploaded_file', filename=img.filename)) %}{% endfor %}
+
+        {% for img_url in all_images %}
+        <div style="width: 80px; height: 80px; cursor: pointer; border: {{ '2px solid #000' if loop.first else '1px solid #ddd' }};" 
+             class="flex-shrink-0 thumbnail-item" 
+             onclick="setMainImage({{ loop.index0 }})">
+          <img src="{{ img_url }}" class="w-100 h-100 object-fit-cover">
         </div>
-        {% endif %}
-        <div style="width: 80px; height: 80px; cursor: pointer; border: 1px solid transparent;" class="flex-shrink-0 bg-surface"></div>
-        <div style="width: 80px; height: 80px; cursor: pointer; border: 1px solid transparent;" class="flex-shrink-0 bg-surface"></div>
-        <div style="width: 80px; height: 80px; cursor: pointer; border: 1px solid transparent;" class="flex-shrink-0 bg-surface"></div>
-        <div style="width: 80px; height: 80px; cursor: pointer; border: 1px solid transparent;" class="flex-shrink-0 bg-surface"></div>
+        {% endfor %}
       </div>
     </div>
+
+    <script>
+      const images = {{ all_images | tojson }};
+      let currentIndex = 0;
+
+      function setMainImage(index) {
+        if (index < 0) index = images.length - 1;
+        if (index >= images.length) index = 0;
+        
+        currentIndex = index;
+        const mainImg = document.getElementById('mainProductImage');
+        if (mainImg) mainImg.src = images[currentIndex];
+        
+        // Update thumbnails
+        document.querySelectorAll('.thumbnail-item').forEach((el, i) => {
+          el.style.borderColor = (i === currentIndex) ? '#000' : '#ddd';
+          el.style.borderWidth = (i === currentIndex) ? '2px' : '1px';
+        });
+      }
+
+      function nextImage() { setMainImage(currentIndex + 1); }
+      function prevImage() { setMainImage(currentIndex - 1); }
+    </script>
 
     <!-- Right: Product Details -->
     <div class="col-12 col-md-6" data-aos="fade-left">

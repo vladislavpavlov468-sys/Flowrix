@@ -63,6 +63,7 @@ class Product(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     order_items = db.relationship("OrderItem", back_populates="product")
+    images = db.relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
 
     @property
     def price_float(self) -> float:
@@ -70,6 +71,21 @@ class Product(db.Model):
 
     def __repr__(self) -> str:
         return f"<Product id={self.id} name={self.name!r} price={self.price}>"
+
+
+
+class ProductImage(db.Model):
+    __tablename__ = "product_images"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
+    filename = db.Column(db.String(256), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    product = db.relationship("Product", back_populates="images")
 
 
 class Order(db.Model):

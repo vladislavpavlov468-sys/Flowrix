@@ -60,12 +60,16 @@ def product_new():
             return render_template("admin/product_form.html", product=None)
 
         image_filename = save_product_image(image_file) if image_file else None
+        extra_images = request.files.getlist("extra_images")
+        extra_filenames = [save_product_image(img) for img in extra_images if img]
+        
         create_product(
             name,
             description,
             float(price),
             category,
-            image_filename)
+            image_filename,
+            extra_filenames)
         flash(f"Товар «{name}» добавлен.", "success")
         return redirect(url_for("admin.products"))
 
@@ -102,6 +106,17 @@ def product_edit(product_id: int):
             float(price),
             category,
             new_image)
+        
+    
+        extra_images = request.files.getlist("extra_images")
+        from models import ProductImage
+        from extensions import db
+        for img in extra_images:
+            if img:
+                fname = save_product_image(img)
+                new_img_obj = ProductImage(product_id=product.id, filename=fname)
+                db.session.add(new_img_obj)
+        db.session.commit()
         flash(f"Товар «{name}» обновлён.", "success")
         return redirect(url_for("admin.products"))
 

@@ -71,16 +71,29 @@
       </div>
 
       <div>
-        <label class="form-label-fx" for="image">Изображение товара</label>
+        <label class="form-label-fx" for="image">Главное изображение</label>
         {% if product and product.image_filename %}
           <img class="image-preview d-block"
                src="{{ url_for('products.uploaded_file', filename=product.image_filename) }}"
                alt="Текущее изображение">
-          <p class="form-hint">Загрузите новое изображение, чтобы заменить текущее.</p>
         {% endif %}
         <input class="input-fx" type="file" id="image" name="image"
                accept="image/png,image/jpeg,image/webp">
-        <p class="form-hint">PNG, JPG, WEBP. Будет автоматически уменьшено до 800×800 px.</p>
+      </div>
+
+      <div>
+        <label class="form-label-fx" for="extra_images">Галерея (доп. фото)</label>
+        <input class="input-fx" type="file" id="extra_images" name="extra_images" 
+               multiple accept="image/png,image/jpeg,image/webp">
+        <p class="form-hint">Вы можете выбрать сразу несколько файлов.</p>
+        {% if product and product.images %}
+          <div class="d-flex gap-2 flex-wrap mt-2">
+            {% for img in product.images %}
+              <img class="image-preview" style="width: 60px; height: 60px;"
+                   src="{{ url_for('products.uploaded_file', filename=img.filename) }}">
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
       <div class="d-flex gap-3 mt-1">
