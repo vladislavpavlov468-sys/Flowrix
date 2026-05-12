@@ -17,7 +17,7 @@
     <div class="col-12 col-md-6" data-aos="fade-right">
       <div class="position-relative bg-surface d-flex align-items-center justify-content-center mb-3" style="aspect-ratio: 1; overflow: hidden; group">
         {% if product.image_filename %}
-          <img src="{{ url_for('products.uploaded_file', filename=product.image_filename) }}" 
+          <img src="{{ product.image_filename if product.image_filename.startswith('http') else url_for('products.uploaded_file', filename=product.image_filename) }}" 
                alt="{{ product.name }}" 
                class="w-100 h-100 object-fit-cover" 
                id="mainProductImage"
@@ -40,8 +40,14 @@
       <!-- Thumbnails -->
       <div class="d-flex gap-2 overflow-auto pb-2" style="scrollbar-width: none;" id="thumbnailContainer">
         {% set all_images = [] %}
-        {% if product.image_filename %}{% set _ = all_images.append(url_for('products.uploaded_file', filename=product.image_filename)) %}{% endif %}
-        {% for img in product.images %}{% set _ = all_images.append(url_for('products.uploaded_file', filename=img.filename)) %}{% endfor %}
+        {% if product.image_filename %}
+          {% set main_url = product.image_filename if product.image_filename.startswith('http') else url_for('products.uploaded_file', filename=product.image_filename) %}
+          {% set _ = all_images.append(main_url) %}
+        {% endif %}
+        {% for img in product.images %}
+          {% set extra_url = img.filename if img.filename.startswith('http') else url_for('products.uploaded_file', filename=img.filename) %}
+          {% set _ = all_images.append(extra_url) %}
+        {% endfor %}
 
         {% for img_url in all_images %}
         <div style="width: 80px; height: 80px; cursor: pointer; border: {{ '2px solid #000' if loop.first else '1px solid #ddd' }};" 

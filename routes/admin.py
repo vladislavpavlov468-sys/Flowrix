@@ -53,23 +53,17 @@ def product_new():
         description = request.form.get("description", "").strip()
         price = request.form.get("price", "0").strip()
         category = request.form.get("category", "").strip()
-        image_file = request.files.get("image")
+        image_url = request.form.get("image_url", "").strip()
+        extra_urls_str = request.form.get("extra_urls", "").strip()
+        extra_urls = [u.strip() for u in extra_urls_str.split("\n") if u.strip()]
 
-        if not name or not price:
-            flash("Название и цена обязательны.", "danger")
-            return render_template("admin/product_form.html", product=None)
-
-        image_filename = save_product_image(image_file) if image_file else None
-        extra_images = request.files.getlist("extra_images")
-        extra_filenames = [save_product_image(img) for img in extra_images if img]
-        
         create_product(
             name,
             description,
             float(price),
             category,
-            image_filename,
-            extra_filenames)
+            image_url,
+            extra_urls)
         flash(f"Товар «{name}» добавлен.", "success")
         return redirect(url_for("admin.products"))
 
@@ -87,34 +81,21 @@ def product_edit(product_id: int):
         description = request.form.get("description", "").strip()
         price = request.form.get("price", "0").strip()
         category = request.form.get("category", "").strip()
-        image_file = request.files.get("image")
-
-        if not name or not price:
-            flash("Название и цена обязательны.", "danger")
-            return render_template("admin/product_form.html", product=product)
-
-        new_image = None
-        if image_file and image_file.filename:
-            if product.image_filename:
-                delete_product_image(product.image_filename)
-            new_image = save_product_image(image_file)
-
+        image_url = request.form.get("image_url", "").strip()
         update_product(
             product,
             name,
             description,
             float(price),
             category,
-            new_image)
+            image_url)
         
-    
-        extra_images = request.files.getlist("extra_images")
+        extra_urls_str = request.form.get("extra_urls", "").strip()
         from models import ProductImage
         from extensions import db
-        for img in extra_images:
-            if img:
-                fname = save_product_image(img)
-                new_img_obj = ProductImage(product_id=product.id, filename=fname)
+        for url in extra_urls_str.split("\n"):
+            if url.strip():
+                new_img_obj = ProductImage(product_id=product.id, filename=url.strip())
                 db.session.add(new_img_obj)
         db.session.commit()
         flash(f"Товар «{name}» обновлён.", "success")

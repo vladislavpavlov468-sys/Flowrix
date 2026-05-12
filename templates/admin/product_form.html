@@ -71,26 +71,26 @@
       </div>
 
       <div>
-        <label class="form-label-fx" for="image">Главное изображение</label>
-        {% if product and product.image_filename %}
-          <img class="image-preview d-block"
-               src="{{ url_for('products.uploaded_file', filename=product.image_filename) }}"
-               alt="Текущее изображение">
-        {% endif %}
-        <input class="input-fx" type="file" id="image" name="image"
-               accept="image/png,image/jpeg,image/webp">
+        <label class="form-label-fx" for="image_url">Ссылка на главное изображение</label>
+        <input class="input-fx" type="url" id="image_url" name="image_url"
+               value="{{ product.image_filename if product else '' }}"
+               placeholder="https://example.com/image.jpg">
+        <p class="form-hint">Вставьте прямую ссылку на картинку (заканчивается на .jpg, .png).</p>
       </div>
 
       <div>
-        <label class="form-label-fx" for="extra_images">Галерея (доп. фото)</label>
-        <input class="input-fx" type="file" id="extra_images" name="extra_images" 
-               multiple accept="image/png,image/jpeg,image/webp">
-        <p class="form-hint">Вы можете выбрать сразу несколько файлов.</p>
+        <label class="form-label-fx" for="extra_urls">Галерея (ссылки, каждая с новой строки)</label>
+        <textarea class="input-fx" id="extra_urls" name="extra_urls" rows="5"
+                  placeholder="https://example.com/image2.jpg&#10;https://example.com/image3.jpg"></textarea>
+        <p class="form-hint">Просто вставьте ссылки на дополнительные фото по одной в каждой строке.</p>
+        
         {% if product and product.images %}
           <div class="d-flex gap-2 flex-wrap mt-2">
             {% for img in product.images %}
-              <img class="image-preview" style="width: 60px; height: 60px;"
-                   src="{{ url_for('products.uploaded_file', filename=img.filename) }}">
+              <div class="position-relative">
+                <img class="image-preview" style="width: 60px; height: 60px;"
+                     src="{{ img.filename if img.filename.startswith('http') else url_for('products.uploaded_file', filename=img.filename) }}">
+              </div>
             {% endfor %}
           </div>
         {% endif %}

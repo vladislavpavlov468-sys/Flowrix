@@ -32,24 +32,25 @@ def get_all_products() -> list[Product]:
 
 
 def create_product(name: str, description: str, price: float,
-                   category: str, image_filename: str | None,
-                   extra_filenames: list[str] | None = None) -> Product:
+                   category: str, image_url: str | None,
+                   extra_urls: list[str] | None = None) -> Product:
     from models import ProductImage
     product = Product(
         name=name,
         description=description,
         price=price,
         category=category,
-        image_filename=image_filename,
+        image_filename=image_url, 
         is_available=True,
     )
     db.session.add(product)
-    db.session.flush() 
+    db.session.flush()
 
-    if extra_filenames:
-        for fname in extra_filenames:
-            img_obj = ProductImage(product_id=product.id, filename=fname)
-            db.session.add(img_obj)
+    if extra_urls:
+        for url in extra_urls:
+            if url.strip():
+                img_obj = ProductImage(product_id=product.id, filename=url.strip())
+                db.session.add(img_obj)
 
     db.session.commit()
     return product
@@ -57,13 +58,13 @@ def create_product(name: str, description: str, price: float,
 
 def update_product(product: Product, name: str, description: str,
                    price: float, category: str,
-                   image_filename: str | None) -> None:
+                   image_url: str | None) -> None:
     product.name = name
     product.description = description
     product.price = price
     product.category = category
-    if image_filename:
-        product.image_filename = image_filename
+    if image_url:
+        product.image_filename = image_url
     db.session.commit()
 
 
