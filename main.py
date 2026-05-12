@@ -28,7 +28,6 @@ def create_app(config_class: object = Config) -> Flask:
 
     @app.before_request
     def initialize_on_first_run():
-        # This will run only once per instance
         if not getattr(app, "_database_initialized", False):
             try:
                 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
