@@ -28,6 +28,16 @@ def update_cart_item_quantity(item_id: int):
     return jsonify({"error": "Item not found"}), 404
 
 
+@api_bp.route("/cart/<int:item_id>", methods=["DELETE"])
+@login_required
+def remove_cart_item(item_id: int):
+    from services.order_service import remove_item_from_cart
+    success = remove_item_from_cart(current_user, item_id)
+    if success:
+        return jsonify(get_cart_data(current_user))
+    return jsonify({"error": "Item not found"}), 404
+
+
 @api_bp.route("/cart", methods=["DELETE"])
 @login_required
 def clear_user_cart():

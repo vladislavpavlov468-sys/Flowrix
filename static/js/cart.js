@@ -44,8 +44,12 @@ function fetchCart() {
         .map(
           (item) => `
         <div class="cart-item d-flex gap-3 mb-4 align-items-center">
-          <div class="cart-item-img bg-surface" style="width: 80px; height: 80px; flex-shrink: 0;">
-            ${item.product_image ? `<img src="/uploads/${item.product_image}" style="width:100%; height:100%; object-fit:cover;">` : `<div class="d-flex align-items-center justify-content-center h-100 text-muted"><i class="bi bi-box"></i></div>`}
+          <div class="cart-item-img bg-surface" style="width: 80px; height: 80px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+            ${item.product_image ? 
+              `<img src="/uploads/${item.product_image}" 
+                    style="width:100%; height:100%; object-fit:cover;" 
+                    onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\\'bi bi-box text-muted\\' style=\\'font-size: 24px;\\'></i>'">` : 
+              `<i class="bi bi-box text-muted" style="font-size: 24px;"></i>`}
           </div>
           <div class="flex-grow-1">
             <div class="d-flex justify-content-between align-items-start mb-1">

@@ -9,13 +9,19 @@ class Config:
 
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-    # Use /tmp for SQLite and Uploads on Vercel (serverless environment)
-    if os.environ.get("VERCEL"):
+    # Priority: 1. Cloud DB (Postgres/MySQL) 2. Vercel /tmp SQLite 3. Local SQLite
+    if os.environ.get("DATABASE_URL"):
+        # Fix for Render/Heroku/Supabase which might use 'postgres://' instead of 'postgresql://'
+        uri = os.environ.get("DATABASE_URL")
+        if uri.startswith("postgres://"):
+            uri = uri.replace("postgres://", "postgresql://", 1)
+        SQLALCHEMY_DATABASE_URI = uri
+    elif os.environ.get("VERCEL"):
         SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/flowrix.db"
-        UPLOAD_FOLDER = "/tmp/uploads"
     else:
         SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(BASE_DIR, 'flowrix.db')}"
-        UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+
+    UPLOAD_FOLDER = "/tmp/uploads" if os.environ.get("VERCEL") else os.path.join(BASE_DIR, "uploads")
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAX_CONTENT_LENGTH = 8 * 1024 * 1024
