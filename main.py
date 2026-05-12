@@ -39,27 +39,28 @@ def create_app(config_class: object = Config) -> Flask:
                 
                 import models
                 db.create_all()
-                _ensure_admin()
                 app._database_initialized = True
             except Exception as e:
                 print(f"Lazy initialization error: {e}")
 
+    @app.before_request
+    def check_admin():
+        _ensure_admin()
+
     return app
+
 
 
 def _ensure_admin():
     from models import User
     try:
-        admin_emails = ["admin@flowrix.ru", "vlad@example.com"]
-        users = User.query.filter(User.email.in_(admin_emails)).all()
-        for u in users:
-            u.role = "admin"
-        
-        first_user = User.query.first()
-        if first_user:
+        first_user = User.query.order_by(User.id.asc()).first()
+        if first_user and first_user.role != "admin":
             first_user.role = "admin"
-        db.session.commit()
-    except Exception:
+            db.session.commit()
+            print(f"User {first_user.username} promoted to Admin")
+    except Exception as e:
+        print(f"Admin promotion error: {e}")
         db.session.rollback()
 
 
