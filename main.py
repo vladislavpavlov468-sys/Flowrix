@@ -26,20 +26,24 @@ def create_app(config_class: object = Config) -> Flask:
     _register_error_handlers(app)
     _register_filters(app)
 
-    with app.app_context():
-        try:
-            os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
-            if os.environ.get("VERCEL") and not os.environ.get("DATABASE_URL"):
-                repo_db = os.path.join(Config.BASE_DIR, 'flowrix.db')
-                target_db = '/tmp/flowrix.db'
-                if os.path.exists(repo_db) and not os.path.exists(target_db):
-                    shutil.copy2(repo_db, target_db)
-
-            import models
-            db.create_all()
-            _ensure_admin()
-        except Exception as e:
-            print(f"Startup error: {e}")
+    @app.before_request
+    def initialize_on_first_run():
+        # This will run only once per instance
+        if not getattr(app, "_database_initialized", False):
+            try:
+                os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+                if os.environ.get("VERCEL") and not os.environ.get("DATABASE_URL"):
+                    repo_db = os.path.join(Config.BASE_DIR, 'flowrix.db')
+                    target_db = '/tmp/flowrix.db'
+                    if os.path.exists(repo_db) and not os.path.exists(target_db):
+                        shutil.copy2(repo_db, target_db)
+                
+                import models
+                db.create_all()
+                _ensure_admin()
+                app._database_initialized = True
+            except Exception as e:
+                print(f"Lazy initialization error: {e}")
 
     return app
 
